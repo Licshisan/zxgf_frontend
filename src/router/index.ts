@@ -27,11 +27,13 @@ const router = createRouter({
             ? import('@/views/DashboardView.vue')
             : item.name === 'profile'
               ? import('@/views/ProfileView.vue')
+              : item.name === 'resources'
+                ? import('@/views/ResourcesView.vue')
               : item.name === 'evaluate'
                 ? import('@/views/EvaluateView.vue')
-              : item.name === 'knowledge'
-                ? import('@/views/KnowledgeView.vue')
-                : import('@/views/BlankView.vue'),
+                : item.name === 'knowledge'
+                  ? import('@/views/KnowledgeView.vue')
+                  : import('@/views/BlankView.vue'),
       })),
     },
     {
