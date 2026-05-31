@@ -15,6 +15,7 @@
     "format": "oxfmt src/"
   },
   "dependencies": {
+    "@iconify/vue": "^5.0.1",
     "@tailwindcss/vite": "^4.3.0",
     "@tdesign-vue-next/chat": "^0.5.2",
     "pinia": "^3.0.4",

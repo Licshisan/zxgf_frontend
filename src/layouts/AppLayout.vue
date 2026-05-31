@@ -30,6 +30,18 @@ const navItems = [
   { value: 'evaluate', label: '测评中心', icon: TaskCheckedIcon },
 ]
 
+const pageTitles: Record<string, string> = {
+  dashboard: '仪表盘',
+  profile: '学习画像',
+  resources: '资源生成',
+  chat: 'AI 问答',
+  evaluate: '测评中心',
+  settings: '系统设置',
+  help: '帮助中心',
+}
+
+const pageTitle = computed(() => pageTitles[activeMenu.value] || '仪表盘')
+
 function handleMenuChange(value: string | number) {
   router.push({ name: String(value) })
 }
@@ -41,19 +53,15 @@ function handleLogout() {
 </script>
 
 <template>
-  <t-layout class="min-h-screen">
+  <t-layout class="h-screen overflow-hidden">
     <t-aside
       width="240px"
-      class="hidden flex-col gap-4 border-r border-gray-200 bg-white px-3 py-5 md:flex"
+      class="hidden h-screen shrink-0 flex-col gap-4 overflow-hidden border-r border-gray-200 bg-white pt-5 md:flex"
     >
-      <div class="flex items-center gap-3 px-2">
-        <img
-          :src="logoUrl"
-          alt="智学工坊"
-          class="h-10 w-10 shrink-0 rounded-lg object-cover"
-        />
+      <div class="flex items-center gap-3 px-4">
+        <img :src="logoUrl" alt="智学工坊" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
         <div>
-          <h1 class="m-0 text-lg font-semibold text-blue-700">智学工坊</h1>
+          <h1 class="m-0 text-2xl font-semibold text-blue-700">智学工坊</h1>
           <p class="m-0 text-xs text-gray-500">AI 学习空间</p>
         </div>
       </div>
@@ -65,8 +73,8 @@ function handleLogout() {
         </t-menu-item>
       </t-menu>
 
-      <div class="mt-auto border-t border-gray-200 pt-3">
-        <t-menu :value="activeMenu" class="border-r-0" @change="handleMenuChange">
+      <div class="mt-auto border-t border-gray-200 pt-2 ">
+        <t-menu :value="activeMenu" @change="handleMenuChange">
           <t-menu-item value="settings">
             <template #icon><SettingIcon /></template>
             系统设置
@@ -79,13 +87,13 @@ function handleLogout() {
       </div>
     </t-aside>
 
-    <t-layout>
+    <t-layout class="h-screen min-w-0 overflow-hidden">
       <t-header
-        class="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6"
+        class="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 bg-white px-4 md:px-6"
       >
         <t-breadcrumb>
-          <t-breadcrumb-item>人工智能导论</t-breadcrumb-item>
-          <t-breadcrumb-item>{{ activeMenu }}</t-breadcrumb-item>
+          <t-breadcrumb-item class="font-semibold !text-blue-700">智学工坊</t-breadcrumb-item>
+          <t-breadcrumb-item>{{ pageTitle }}</t-breadcrumb-item>
         </t-breadcrumb>
 
         <t-space align="center">
@@ -96,7 +104,7 @@ function handleLogout() {
             <template #icon><AppIcon /></template>
           </t-button>
           <t-dropdown>
-            <t-avatar>{{ auth.user?.name?.slice(0, 1) || 'U' }}</t-avatar>
+            <t-avatar shape="round">{{ auth.user?.name?.slice(0, 1) || 'U' }}</t-avatar>
             <template #dropdown>
               <t-dropdown-menu>
                 <t-dropdown-item>
@@ -110,9 +118,20 @@ function handleLogout() {
         </t-space>
       </t-header>
 
-      <t-content class="min-w-0 bg-[#f7f9fc]">
+      <t-content class="min-w-0 flex-1 overflow-y-auto bg-[#f7f9fc]">
         <router-view />
       </t-content>
     </t-layout>
   </t-layout>
 </template>
+
+<style scoped>
+:deep(.t-menu__item) {
+  margin-bottom: 12px;
+  border-right: 3px solid transparent;
+}
+
+:deep(.t-menu__item.t-is-active) {
+  border-right-color: #2563eb;
+}
+</style>

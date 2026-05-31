@@ -21,7 +21,8 @@ const router = createRouter({
       children: layoutPages.map((item) => ({
         path: item.path,
         name: item.name,
-        component: () => import('@/views/BlankView.vue'),
+        component: () =>
+          item.name === 'dashboard' ? import('@/views/DashboardView.vue') : import('@/views/BlankView.vue'),
       })),
     },
     {
@@ -30,20 +31,6 @@ const router = createRouter({
       component: () => import('@/views/LoginView.vue'),
     },
   ],
-})
-
-router.beforeEach((to) => {
-  const auth = useAuthStore()
-
-  if (to.meta.requiresAuth && !auth.isLoggedIn) {
-    return { name: 'login', query: { redirect: to.fullPath } }
-  }
-
-  if (to.name === 'login' && auth.isLoggedIn) {
-    return { name: 'dashboard' }
-  }
-
-  return true
 })
 
 export default router
