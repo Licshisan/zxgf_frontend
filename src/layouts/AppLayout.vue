@@ -80,10 +80,7 @@ function toggleTheme(event: MouseEvent) {
     Math.max(x, window.innerWidth - x),
     Math.max(y, window.innerHeight - y),
   )
-  const clipPath = [
-    `circle(0px at ${x}px ${y}px)`,
-    `circle(${endRadius}px at ${x}px ${y}px)`,
-  ]
+  const clipPath = [`circle(0px at ${x}px ${y}px)`, `circle(${endRadius}px at ${x}px ${y}px)`]
 
   document.documentElement.classList.toggle('theme-transition-to-dark', nextMode === 'dark')
   document.documentElement.classList.toggle('theme-transition-to-light', nextMode === 'light')
@@ -108,7 +105,10 @@ function toggleTheme(event: MouseEvent) {
   })
 
   transition.finished.finally(() => {
-    document.documentElement.classList.remove('theme-transition-to-dark', 'theme-transition-to-light')
+    document.documentElement.classList.remove(
+      'theme-transition-to-dark',
+      'theme-transition-to-light',
+    )
   })
 }
 
@@ -136,22 +136,14 @@ watch(themeMode, applyTheme)
         </div>
       </div>
 
-      <t-menu
-        :value="activeMenu"
-        :theme="themeMode"
-        class="border-r-0"
-        @change="handleMenuChange"
-      >
+      <t-menu :value="activeMenu" :theme="themeMode" class="border-r-0" @change="handleMenuChange">
         <t-menu-item v-for="item in navItems" :key="item.value" :value="item.value">
           <template #icon><component :is="item.icon" /></template>
           {{ item.label }}
         </t-menu-item>
       </t-menu>
 
-      <div
-        class="mt-auto border-t pt-2"
-        :class="isDark ? 'border-gray-800' : 'border-gray-200'"
-      >
+      <div class="mt-auto border-t pt-2" :class="isDark ? 'border-gray-800' : 'border-gray-200'">
         <t-menu :value="activeMenu" :theme="themeMode" @change="handleMenuChange">
           <t-menu-item value="settings">
             <template #icon><SettingIcon /></template>

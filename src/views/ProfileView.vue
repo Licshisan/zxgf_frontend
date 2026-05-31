@@ -91,10 +91,30 @@ import type { SSEChunkData, AIMessageContent, ChatServiceConfig } from '@tdesign
  */
 
 const portraitCards = [
-  { label: '当前知识储备', value: 'Python 基础', desc: 'Level 2 / 5', icon: 'material-symbols:database' },
-  { label: '预期投入', value: '2 小时/天', desc: '适合短周期项目任务', icon: 'material-symbols:schedule' },
-  { label: '学习偏好', value: '项目驱动', desc: '实践优先，理论辅助', icon: 'material-symbols:construction' },
-  { label: '反馈方式', value: '即时纠错', desc: '适合边做边改', icon: 'material-symbols:fact-check' },
+  {
+    label: '当前知识储备',
+    value: 'Python 基础',
+    desc: 'Level 2 / 5',
+    icon: 'material-symbols:database',
+  },
+  {
+    label: '预期投入',
+    value: '2 小时/天',
+    desc: '适合短周期项目任务',
+    icon: 'material-symbols:schedule',
+  },
+  {
+    label: '学习偏好',
+    value: '项目驱动',
+    desc: '实践优先，理论辅助',
+    icon: 'material-symbols:construction',
+  },
+  {
+    label: '反馈方式',
+    value: '即时纠错',
+    desc: '适合边做边改',
+    icon: 'material-symbols:fact-check',
+  },
 ]
 
 const skillTags = ['Python', '算法基础', '项目实践', '可视化学习']

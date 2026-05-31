@@ -192,7 +192,9 @@ onBeforeUnmount(() => {
         </template>
         <div class="flex min-h-[260px] flex-col items-center justify-center gap-5">
           <t-progress theme="circle" :percentage="85" size="160" />
-          <div class="w-full rounded-md border border-gray-100 bg-gray-50 p-3 text-sm text-gray-600">
+          <div
+            class="w-full rounded-md border border-gray-100 bg-gray-50 p-3 text-sm text-gray-600"
+          >
             <div class="flex items-center justify-between">
               <span class="flex items-center gap-1 text-rose-600">
                 <Icon icon="material-symbols:trending-up" />

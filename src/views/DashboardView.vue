@@ -10,7 +10,12 @@ const tasks = [
 const weakPoints = [
   { title: '梯度消失问题', progress: 35, theme: 'danger', icon: 'material-symbols:trending-down' },
   { title: '激活函数选择', progress: 55, theme: 'warning', icon: 'material-symbols:functions' },
-  { title: '反向传播链式法则', progress: 48, theme: 'primary', icon: 'material-symbols:device-hub' },
+  {
+    title: '反向传播链式法则',
+    progress: 48,
+    theme: 'primary',
+    icon: 'material-symbols:device-hub',
+  },
 ]
 
 const agents = [
@@ -65,7 +70,9 @@ const resources = [
         :bordered="true"
         class="overflow-hidden bg-gradient-to-l from-cyan-50 via-blue-50 to-white bg-no-repeat"
       >
-        <div class="flex flex-col gap-6 py-4 md:flex-row md:items-center md:justify-between md:py-6">
+        <div
+          class="flex flex-col gap-6 py-4 md:flex-row md:items-center md:justify-between md:py-6"
+        >
           <div>
             <h1 class="m-0 flex items-center gap-2 text-3xl font-semibold text-gray-900">
               早上好，同学
@@ -129,7 +136,9 @@ const resources = [
                   <Icon :icon="point.icon" class="text-gray-500" width="16" />
                   {{ point.title }}
                 </span>
-                <t-tag size="small" :theme="point.theme" variant="light">{{ point.progress }}%</t-tag>
+                <t-tag size="small" :theme="point.theme" variant="light"
+                  >{{ point.progress }}%</t-tag
+                >
               </div>
               <t-progress :percentage="point.progress" :theme="point.theme" />
             </div>
@@ -152,7 +161,11 @@ const resources = [
           <t-tag theme="success" variant="light">3 个智能体在线</t-tag>
         </template>
         <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
-          <div v-for="agent in agents" :key="agent.name" class="rounded-md border border-gray-200 p-4">
+          <div
+            v-for="agent in agents"
+            :key="agent.name"
+            class="rounded-md border border-gray-200 p-4"
+          >
             <t-space align="center">
               <t-avatar theme="primary">
                 <template #icon><Icon :icon="agent.icon" /></template>
@@ -244,14 +257,18 @@ const resources = [
             </t-space>
             <div class="mt-4 border-l-2 border-gray-200 pl-4">
               <div class="relative pb-4">
-                <span class="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-blue-600 ring-4 ring-white"></span>
+                <span
+                  class="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-blue-600 ring-4 ring-white"
+                ></span>
                 <p class="m-0 text-xs text-gray-500">10:30</p>
                 <p class="mb-0 mt-1 text-sm leading-6 text-gray-700">
                   降低推导难度，增加几何解释图例。
                 </p>
               </div>
               <div class="relative">
-                <span class="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-gray-400 ring-4 ring-white"></span>
+                <span
+                  class="absolute -left-[21px] top-1 h-2.5 w-2.5 rounded-full bg-gray-400 ring-4 ring-white"
+                ></span>
                 <p class="m-0 text-xs text-gray-500">昨天</p>
                 <p class="mb-0 mt-1 text-sm leading-6 text-gray-700">
                   检测到连续答错，插入基础复习卡片。

@@ -164,11 +164,7 @@ function showUnavailable() {
       <aside class="flex min-w-0 flex-1 flex-col gap-10">
         <div class="space-y-3">
           <div class="flex items-center gap-3">
-            <img
-              :src="logoUrl"
-              alt="智学工坊"
-              class="h-12 w-12 shrink-0 rounded-xl object-cover"
-            />
+            <img :src="logoUrl" alt="智学工坊" class="h-12 w-12 shrink-0 rounded-xl object-cover" />
             <h1 class="m-0 text-[32px] font-semibold text-blue-700">智学工坊</h1>
           </div>
           <p class="m-0 max-w-[440px] text-[15px] leading-7 text-gray-600">
@@ -227,7 +223,6 @@ function showUnavailable() {
                 </div>
               </t-form-item>
 
-
               <t-button theme="primary" block :loading="loading" @click="handleLogin">
                 进入学习空间
                 <template #suffix><ArrowRightIcon /></template>
@@ -238,11 +233,7 @@ function showUnavailable() {
           <t-tab-panel value="register" label="注册">
             <t-form layout="vertical" label-align="top" class="!my-4">
               <t-form-item label="用户名" class="!mb-3">
-                <t-input
-                  v-model="registerForm.name"
-                  placeholder="设置你的学习昵称"
-                  clearable
-                />
+                <t-input v-model="registerForm.name" placeholder="设置你的学习昵称" clearable />
               </t-form-item>
 
               <t-form-item label="邮箱" class="!mb-3">

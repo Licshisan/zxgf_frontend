@@ -1,5 +1,4 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
 
 const layoutPages = [
   { path: '', name: 'dashboard' },
@@ -31,11 +30,11 @@ const router = createRouter({
                 ? import('@/views/ResourcesView.vue')
                 : item.name === 'chat'
                   ? import('@/views/ChatView.vue')
-              : item.name === 'evaluate'
-                ? import('@/views/EvaluateView.vue')
-                  : item.name === 'knowledge'
-                    ? import('@/views/KnowledgeView.vue')
-                    : import('@/views/BlankView.vue'),
+                  : item.name === 'evaluate'
+                    ? import('@/views/EvaluateView.vue')
+                    : item.name === 'knowledge'
+                      ? import('@/views/KnowledgeView.vue')
+                      : import('@/views/BlankView.vue'),
       })),
     },
     {

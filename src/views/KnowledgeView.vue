@@ -150,7 +150,13 @@ const documents = [
           <t-tag :theme="row.statusTheme" variant="light">
             <template #icon>
               <Icon
-                :icon="row.statusTheme === 'success' ? 'material-symbols:check-circle' : row.statusTheme === 'danger' ? 'material-symbols:error' : 'material-symbols:sync'"
+                :icon="
+                  row.statusTheme === 'success'
+                    ? 'material-symbols:check-circle'
+                    : row.statusTheme === 'danger'
+                      ? 'material-symbols:error'
+                      : 'material-symbols:sync'
+                "
                 :class="{ 'animate-spin': row.statusTheme === 'primary' }"
               />
             </template>
