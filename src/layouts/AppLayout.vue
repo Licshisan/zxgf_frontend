@@ -7,6 +7,7 @@ import {
   ChatBubbleLockedIcon,
   DashboardIcon,
   HelpCircleIcon,
+  MenuFoldIcon,
   NotificationIcon,
   RobotIcon,
   SettingIcon,
@@ -25,6 +26,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const themeMode = ref<ThemeMode>('light')
+const mobileMenuVisible = ref(false)
 
 const activeMenu = computed(() => String(route.name || 'dashboard'))
 const isDark = computed(() => themeMode.value === 'dark')
@@ -59,6 +61,7 @@ function applyTheme(mode: ThemeMode) {
 
 function handleMenuChange(value: string | number) {
   router.push({ name: String(value) })
+  mobileMenuVisible.value = false
 }
 
 function handleLogout() {
@@ -162,10 +165,21 @@ watch(themeMode, applyTheme)
         class="flex h-16 shrink-0 items-center justify-between border-b px-4 md:px-6"
         :class="isDark ? 'border-gray-800 bg-[#15171a]' : 'border-gray-200 bg-white'"
       >
-        <t-breadcrumb>
-          <t-breadcrumb-item class="font-semibold !text-blue-600">智学工坊</t-breadcrumb-item>
-          <t-breadcrumb-item>{{ pageTitle }}</t-breadcrumb-item>
-        </t-breadcrumb>
+        <div class="flex min-w-0 items-center gap-2">
+          <t-button
+            variant="text"
+            shape="square"
+            class="mobile-menu-button"
+            @click="mobileMenuVisible = true"
+          >
+            <template #icon><MenuFoldIcon /></template>
+          </t-button>
+
+          <t-breadcrumb class="min-w-0">
+            <t-breadcrumb-item class="font-semibold !text-blue-600">智学工坊</t-breadcrumb-item>
+            <t-breadcrumb-item>{{ pageTitle }}</t-breadcrumb-item>
+          </t-breadcrumb>
+        </div>
 
         <t-space align="center">
           <t-tooltip :content="isDark ? '切换浅色主题' : '切换暗黑主题'">
@@ -197,6 +211,49 @@ watch(themeMode, applyTheme)
         </t-space>
       </t-header>
 
+      <t-drawer
+        v-model:visible="mobileMenuVisible"
+        placement="left"
+        :footer="false"
+        size="280px"
+        :header="false"
+      >
+        <div
+          class="flex h-full flex-col gap-4 pt-1"
+          :class="isDark ? 'bg-[#15171a] text-gray-100' : 'bg-white text-gray-900'"
+        >
+          <div class="flex items-center gap-3 px-1 pb-3">
+            <img :src="logoUrl" alt="智学工坊" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
+            <div class="min-w-0">
+              <h2 class="m-0 text-lg font-semibold text-blue-600">智学工坊</h2>
+              <p class="m-0 text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+                AI 学习智能体
+              </p>
+            </div>
+          </div>
+
+          <t-menu :value="activeMenu" :theme="themeMode" class="border-r-0" @change="handleMenuChange">
+            <t-menu-item v-for="item in navItems" :key="item.value" :value="item.value">
+              <template #icon><component :is="item.icon" /></template>
+              {{ item.label }}
+            </t-menu-item>
+          </t-menu>
+
+          <div class="mt-auto border-t pt-2" :class="isDark ? 'border-gray-800' : 'border-gray-200'">
+            <t-menu :value="activeMenu" :theme="themeMode" @change="handleMenuChange">
+              <t-menu-item value="settings">
+                <template #icon><SettingIcon /></template>
+                系统设置
+              </t-menu-item>
+              <t-menu-item value="help">
+                <template #icon><HelpCircleIcon /></template>
+                帮助中心
+              </t-menu-item>
+            </t-menu>
+          </div>
+        </div>
+      </t-drawer>
+
       <t-content
         class="app-scrollbar min-w-0 flex-1 overflow-y-auto"
         :class="isDark ? 'bg-[#101214]' : 'bg-[#f7f9fc]'"
@@ -215,6 +272,16 @@ watch(themeMode, applyTheme)
 
 :deep(.t-menu__item.t-is-active) {
   border-right-color: #2563eb;
+}
+
+.mobile-menu-button {
+  display: inline-flex;
+}
+
+@media (min-width: 768px) {
+  .mobile-menu-button {
+    display: none !important;
+  }
 }
 
 :global(::view-transition-old(root)),
