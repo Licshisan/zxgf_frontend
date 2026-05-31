@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI 问答 - 智学工坊</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries,typography"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed-dim": "#44dada",
+                    "inverse-surface": "#2d3133",
+                    "tertiary-container": "#8e4fee",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#f7f9fc",
+                    "surface-variant": "#e0e3e6",
+                    "on-primary-fixed": "#001a43",
+                    "primary-container": "#006ef2",
+                    "surface-container-high": "#e6e8eb",
+                    "surface-container-highest": "#e0e3e6",
+                    "inverse-on-surface": "#eff1f4",
+                    "surface-dim": "#d8dadd",
+                    "primary": "#0057c2",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#afc6ff",
+                    "on-surface": "#191c1e",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#270057",
+                    "tertiary": "#7431d3",
+                    "surface-tint": "#0059c7",
+                    "secondary-fixed": "#68f7f7",
+                    "outline": "#727786",
+                    "secondary": "#006a6a",
+                    "on-tertiary-container": "#fffbff",
+                    "surface-container-low": "#f2f4f7",
+                    "on-tertiary-fixed-variant": "#5e08bd",
+                    "on-background": "#191c1e",
+                    "secondary-container": "#65f4f4",
+                    "on-tertiary": "#ffffff",
+                    "on-primary-fixed-variant": "#004398",
+                    "surface-container": "#eceef1",
+                    "background": "#f7f9fc",
+                    "inverse-primary": "#afc6ff",
+                    "on-surface-variant": "#414755",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#002020",
+                    "on-secondary-container": "#006e6e",
+                    "on-error-container": "#93000a",
+                    "on-primary-container": "#fefcff",
+                    "outline-variant": "#c1c6d7",
+                    "tertiary-fixed": "#ecdcff",
+                    "tertiary-fixed-dim": "#d5baff",
+                    "on-secondary-fixed-variant": "#004f50",
+                    "primary-fixed": "#d9e2ff",
+                    "surface": "#f7f9fc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "base": "4px",
+                    "gutter": "16px",
+                    "max-width": "1440px",
+                    "sm": "8px",
+                    "margin-mobile": "16px",
+                    "xs": "4px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "margin-desktop": "24px"
+            },
+            "fontFamily": {
+                    "h1-mobile": [
+                            "Inter, PingFang SC"
+                    ],
+                    "label-md": [
+                            "Inter, PingFang SC"
+                    ],
+                    "h3": [
+                            "Inter, PingFang SC"
+                    ],
+                    "h1": [
+                            "Inter, PingFang SC"
+                    ],
+                    "body-lg": [
+                            "Inter, PingFang SC"
+                    ],
+                    "body-sm": [
+                            "Inter, PingFang SC"
+                    ],
+                    "label-sm": [
+                            "Inter, PingFang SC"
+                    ],
+                    "body-md": [
+                            "Inter, PingFang SC"
+                    ],
+                    "h2": [
+                            "Inter, PingFang SC"
+                    ]
+            },
+            "fontSize": {
+                    "h1-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "h3": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "h1": [
+                            "30px",
+                            {
+                                    "lineHeight": "38px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "18px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "22px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "h2": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        /* Custom scrollbar for better UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d8dadd;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #c1c6d7;
+        }
+        
+        /* Math display simulation */
+        .math-block {
+            font-family: "Times New Roman", Times, serif;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex">
+<!-- SideNavBar (from JSON) -->
+<nav class="bg-surface dark:bg-inverse-surface w-[240px] h-screen fixed left-0 top-0 border-r border-outline-variant dark:border-outline flex flex-col py-lg px-md z-20">
+<!-- Brand -->
+<div class="mb-xl flex items-center gap-sm">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<h2 class="text-h2 font-h2 font-bold text-primary dark:text-inverse-primary">智学工坊</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant">AI 学术工作空间</p>
+</div>
+</div>
+<!-- Main Nav -->
+<div class="flex-1 overflow-y-auto">
+<button class="w-full bg-primary text-on-primary rounded-lg py-sm px-md flex items-center justify-center gap-sm mb-lg shadow-[0_2px_12px_0_rgba(0,0,0,0.05)] hover:bg-primary-container hover:text-on-primary-container transition-colors h-[40px]">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span class="text-label-md font-label-md">开启新任务</span>
+</button>
+<ul class="space-y-sm">
+<!-- 仪表盘 -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="text-label-md font-label-md">仪表盘</span>
+</a>
+</li>
+<!-- 学习画像 -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="analytics">analytics</span>
+<span class="text-label-md font-label-md">学习画像</span>
+</a>
+</li>
+<!-- 资源生成 -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="auto_awesome">auto_awesome</span>
+<span class="text-label-md font-label-md">资源生成</span>
+</a>
+</li>
+<!-- 学习路径 -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="alt_route">alt_route</span>
+<span class="text-label-md font-label-md">学习路径</span>
+</a>
+</li>
+<!-- AI 问答 (ACTIVE) -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary dark:text-inverse-primary font-bold border-r-4 border-primary hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98] bg-surface-container-low" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="forum" style="font-variation-settings: 'FILL' 1;">forum</span>
+<span class="text-label-md font-label-md">AI 问答</span>
+</a>
+</li>
+<!-- 测评中心 -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="quiz">quiz</span>
+<span class="text-label-md font-label-md">测评中心</span>
+</a>
+</li>
+<!-- 知识库 -->
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inventory_2">inventory_2</span>
+<span class="text-label-md font-label-md">知识库</span>
+</a>
+</li>
+</ul>
+</div>
+<!-- Footer Nav -->
+<div class="pt-md border-t border-outline-variant mt-auto">
+<ul class="space-y-sm">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span class="text-label-md font-label-md">系统设置</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="help">help</span>
+<span class="text-label-md font-label-md">帮助中心</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- TopNavBar (from JSON) -->
+<header class="bg-surface dark:bg-inverse-surface h-[64px] fixed top-0 right-0 left-[240px] z-10 border-b border-outline-variant dark:border-outline flex justify-between items-center px-lg">
+<div class="flex items-center gap-md">
+<!-- Breadcrumbs / Navigation Links -->
+<div class="flex items-center text-label-sm font-label-sm">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">人工智能导论</a>
+<span class="material-symbols-outlined text-[16px] mx-xs text-outline-variant">chevron_right</span>
+<span class="text-primary font-bold">学习目标: 掌握神经网络基础</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<!-- Trailing Actions -->
+<button class="p-xs rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors active:opacity-80">
+<span class="material-symbols-outlined text-[20px]" data-icon="notifications">notifications</span>
+</button>
+<button class="p-xs rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors active:opacity-80">
+<span class="material-symbols-outlined text-[20px]" data-icon="dark_mode">dark_mode</span>
+</button>
+<button class="p-xs rounded-full text-on-surface-variant hover:bg-surface-container-high transition-colors active:opacity-80">
+<span class="material-symbols-outlined text-[20px]" data-icon="apps">apps</span>
+</button>
+<!-- Profile Avatar -->
+<div class="w-8 h-8 rounded-full bg-surface-variant border border-outline-variant overflow-hidden ml-sm cursor-pointer">
+<img alt="用户头像" class="w-full h-full object-cover" data-alt="A clean, professional user avatar placeholder featuring a white silhouette or initials against a dark blue (#0057c2) background. The style is modern, minimalist, and flat, typical of enterprise software profiles. No complex gradients or realistic details, just a sharp, scalable vector-style graphic suitable for a small UI element." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_rEY4tMQiqlQKJ8GyP-FoWOUSyuCva882FKDqWAc0LKkTON2qZcFzIpOpxX5AN3VLvhKV6l6cgpQJmF37jIBVwfTPpwyerzpt6vFrtDU3VWRzX965SPwDHJPTbJhsplW6njSLkn3mBhmrazgq75xWCmG-1CsaTlq7PV1rsR4jSBN6ZMq0xEVoIVFrG5W_Y9oMy0aeHQuLRgr3-RcEmGvD16bptN0vV9NERgYzAXpFGK3anmbtm5aF1E913LOVbUMv5FSa40Cjyzdb"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-[240px] mt-[64px] flex-1 flex h-[calc(100vh-64px)] overflow-hidden bg-background">
+<!-- Left Column: Knowledge Tree -->
+<aside class="w-[280px] bg-surface border-r border-outline-variant flex flex-col h-full flex-shrink-0 z-0">
+<div class="p-md border-b border-outline-variant bg-surface-bright sticky top-0">
+<h3 class="text-h3 font-h3 font-bold text-on-surface">知识目录</h3>
+<p class="text-label-sm font-label-sm text-on-surface-variant mt-xs">《人工智能导论》</p>
+<div class="mt-sm relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-[18px] text-outline">search</span>
+<input class="w-full pl-[32px] pr-sm py-xs text-body-sm font-body-sm bg-surface-container rounded border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-colors h-[32px]" placeholder="搜索知识点..." type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-sm">
+<!-- Tree Node 1 -->
+<div class="mb-sm">
+<button class="w-full flex items-center justify-between p-sm rounded hover:bg-surface-container-high transition-colors text-left group">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant transition-transform rotate-90">arrow_right</span>
+<span class="material-symbols-outlined text-[18px] text-primary">folder</span>
+<span class="text-label-md font-label-md text-on-surface">1. 概述与历史</span>
+</div>
+</button>
+</div>
+<!-- Tree Node 2 (Expanded) -->
+<div class="mb-sm">
+<button class="w-full flex items-center justify-between p-sm rounded hover:bg-surface-container-high transition-colors text-left group">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant transition-transform rotate-90">arrow_right</span>
+<span class="material-symbols-outlined text-[18px] text-primary">folder_open</span>
+<span class="text-label-md font-label-md text-on-surface font-semibold">2. 机器学习基础</span>
+</div>
+</button>
+<!-- Children -->
+<div class="ml-[24px] border-l border-outline-variant pl-xs mt-xs space-y-xs">
+<a class="block p-xs rounded hover:bg-surface-container-low text-body-sm font-body-sm text-on-surface-variant" href="#">2.1 监督学习与无监督学习</a>
+<a class="block p-xs rounded hover:bg-surface-container-low text-body-sm font-body-sm text-on-surface-variant" href="#">2.2 线性回归与逻辑回归</a>
+<a class="block p-xs rounded bg-primary-fixed text-primary font-medium text-body-sm font-body-sm border-l-2 border-primary -ml-[1px] pl-[11px]" href="#">2.3 神经网络初步</a>
+<a class="block p-xs rounded hover:bg-surface-container-low text-body-sm font-body-sm text-on-surface-variant" href="#">2.4 支持向量机 (SVM)</a>
+</div>
+</div>
+<!-- Tree Node 3 -->
+<div class="mb-sm">
+<button class="w-full flex items-center justify-between p-sm rounded hover:bg-surface-container-high transition-colors text-left group">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant transition-transform">arrow_right</span>
+<span class="material-symbols-outlined text-[18px] text-primary">folder</span>
+<span class="text-label-md font-label-md text-on-surface">3. 深度学习进阶</span>
+</div>
+</button>
+</div>
+</div>
+</aside>
+<!-- Middle Column: Chat / Q&A Area -->
+<section class="flex-1 flex flex-col h-full bg-background min-w-0 relative">
+<!-- Chat Scroll Area -->
+<div class="flex-1 overflow-y-auto p-lg scroll-smooth pb-[120px]">
+<!-- User Message -->
+<div class="flex flex-col items-end mb-lg">
+<div class="flex items-end gap-sm max-w-[80%]">
+<div class="bg-primary text-on-primary rounded-2xl rounded-tr-sm p-md shadow-sm">
+<p class="text-body-md font-body-md">请详细解释一下反向传播算法（Backpropagation）的工作原理，最好能有数学公式和代码示例帮助理解。</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-variant border border-outline-variant overflow-hidden flex-shrink-0">
+<img alt="用户" class="w-full h-full object-cover" data-alt="Small round user avatar profile icon, minimalist design with a white initial 'U' on a solid dark blue background. Professional UI element style, no complex shading." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnD5MZUpyaQthEqOeSgT5w5qDb7OjvOhXDkBu-xnLqwyn9hNzNnBYskBKemKGaao2hL-mAkwZ08YHCgyVif5xsCFUO7i_jtEE5YTGqLO7lMtm9MQBRHb4kwc9l8NUdnivnjZb1wUDCSkIQTGP5s2MHRROz7vBdrG2VzofZ7YZxsSvOjvGW5L8o8Z50LZwIYD-5UxORK1a5EGhxVq4ENHTmCgZZ87ybo21n-CZ6Pbui66sInTgryhfCiEzq2wmIWNX0HYDHWKbslL5F"/>
+</div>
+</div>
+</div>
+<!-- AI Response Card (Bento/Glassmorphism-lite) -->
+<div class="flex flex-col items-start mb-lg max-w-[90%]">
+<div class="flex items-end gap-sm w-full">
+<div class="w-8 h-8 rounded bg-tertiary-fixed flex items-center justify-center text-tertiary flex-shrink-0 mb-auto mt-2">
+<span class="material-symbols-outlined text-[20px]">smart_toy</span>
+</div>
+<div class="w-full bg-surface border border-outline-variant rounded-2xl rounded-tl-sm p-lg shadow-[0_2px_12px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+<!-- AI Card Header Decoration -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary-fixed-dim"></div>
+<!-- 1. Conceptual Explanation -->
+<div class="mb-lg">
+<h4 class="text-h3 font-h3 font-bold text-on-surface flex items-center gap-xs mb-sm">
+<span class="material-symbols-outlined text-primary text-[20px]">lightbulb</span>
+                                    反向传播算法 (Backpropagation) 概念解析
+                                </h4>
+<p class="text-body-md font-body-md text-on-surface-variant leading-relaxed">
+                                    反向传播是训练人工神经网络的核心算法。它的主要目的是计算损失函数（Loss Function）对网络中每个权重的偏导数（梯度），从而使优化算法（如梯度下降）能够更新这些权重，最小化预测误差。简而言之，它是一个<strong>“误差向后传递，分配责任”</strong>的过程。
+                                </p>
+</div>
+<!-- 2. Steps / Math Formula -->
+<div class="mb-lg bg-surface-container-low rounded-lg p-md border border-outline-variant">
+<h5 class="text-label-md font-label-md font-bold text-on-surface mb-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-secondary text-[18px]">functions</span>
+                                    核心数学推导 (链式法则)
+                                </h5>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-xs">假设一个简单的线性层 $z = wx + b$，激活函数为 $a = \sigma(z)$，损失函数为 $L$。</p>
+<div class="bg-surface p-sm rounded border border-outline-variant overflow-x-auto my-sm font-mono text-body-sm flex justify-center py-md text-on-surface">
+<!-- Simulated LaTeX -->
+<span class="math-block">
+                                        ∂L / ∂w = (∂L / ∂a) · (∂a / ∂z) · (∂z / ∂w)
+                                    </span>
+</div>
+<ol class="list-decimal list-inside text-body-sm font-body-sm text-on-surface-variant space-y-xs ml-xs">
+<li><strong>前向传播 (Forward Pass)：</strong> 计算每层的输出 $z$ 和 $a$，直到得出最终预测并计算损失 $L$。</li>
+<li><strong>计算误差项 (Compute Error)：</strong> 计算输出层的误差梯度。</li>
+<li><strong>反向传播误差 (Backpropagate Error)：</strong> 运用链式法则，将误差逐层向前倒推。</li>
+<li><strong>更新权重 (Update Weights)：</strong> $w_{new} = w_{old} - \eta \cdot (\partial L / \partial w)$，其中 $\eta$ 是学习率。</li>
+</ol>
+</div>
+<!-- 3. Code Block -->
+<div class="mb-lg">
+<h5 class="text-label-md font-label-md font-bold text-on-surface mb-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-tertiary text-[18px]">code</span>
+                                    Python (NumPy) 代码简例
+                                </h5>
+<div class="bg-[#1e1e1e] rounded-lg overflow-hidden border border-outline-variant">
+<div class="flex justify-between items-center px-md py-xs bg-[#2d2d2d] border-b border-[#404040]">
+<span class="text-[11px] font-mono text-gray-400">python</span>
+<button class="text-gray-400 hover:text-white transition-colors"><span class="material-symbols-outlined text-[16px]">content_copy</span></button>
+</div>
+<pre class="p-md overflow-x-auto text-body-sm font-mono text-[#d4d4d4] leading-relaxed"><code>import numpy as np
+
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+# 假设我们在输出层，a2 是预测值，y 是真实值
+error = y - a2
+# 计算输出层 delta
+d_a2 = error * sigmoid_derivative(a2)
+
+# 计算隐藏层误差 (假设 weights2 是连接隐藏层和输出层的权重)
+error_hidden = d_a2.dot(weights2.T)
+# 计算隐藏层 delta
+d_hidden = error_hidden * sigmoid_derivative(a1)
+
+# 更新权重 (lr = 0.1)
+weights2 += a1.T.dot(d_a2) * 0.1
+weights1 += X.T.dot(d_hidden) * 0.1</code></pre>
+</div>
+</div>
+<!-- 4. Common Mistakes & Resources (Bento Grid Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Mistakes -->
+<div class="bg-error-container/20 border border-error-container rounded-lg p-md">
+<h5 class="text-label-sm font-label-sm font-bold text-error mb-xs flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                                        易错点警示
+                                    </h5>
+<ul class="text-body-sm font-body-sm text-on-surface-variant list-disc list-inside space-y-1">
+<li><strong>梯度消失：</strong> 在深层网络中使用 Sigmoid 时容易发生，导致浅层权重无法更新。</li>
+<li><strong>维度不匹配：</strong> 矩阵乘法（Dot Product）时未正确转置矩阵。</li>
+</ul>
+</div>
+<!-- Recommendation -->
+<div class="bg-tertiary-fixed/30 border border-tertiary-fixed-dim rounded-lg p-md">
+<h5 class="text-label-sm font-label-sm font-bold text-tertiary mb-xs flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+                                        推荐深入阅读
+                                    </h5>
+<a class="block text-body-sm font-body-sm text-primary hover:underline truncate mb-1" href="#">▶ 斯坦福 CS231n: 反向传播直观理解</a>
+<a class="block text-body-sm font-body-sm text-primary hover:underline truncate" href="#">▶ 《深度学习》(花书) 第6.5节</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Input Area (Fixed Bottom) -->
+<div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-background via-background to-transparent pt-xl pb-lg px-lg">
+<div class="max-w-4xl mx-auto">
+<div class="bg-surface border border-outline-variant rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] p-xs focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all">
+<textarea class="w-full resize-none border-none bg-transparent focus:ring-0 text-body-md font-body-md text-on-surface placeholder-on-surface-variant p-sm min-h-[60px]" placeholder="输入你想了解的知识点，支持 Markdown 或 LaTeX 公式输入..." rows="2"></textarea>
+<div class="flex justify-between items-center px-sm pb-sm mt-xs">
+<div class="flex gap-xs">
+<button class="p-xs text-outline hover:text-primary transition-colors rounded hover:bg-surface-container-low" title="插入公式">
+<span class="material-symbols-outlined text-[20px]">functions</span>
+</button>
+<button class="p-xs text-outline hover:text-primary transition-colors rounded hover:bg-surface-container-low" title="插入代码">
+<span class="material-symbols-outlined text-[20px]">data_object</span>
+</button>
+<button class="p-xs text-outline hover:text-primary transition-colors rounded hover:bg-surface-container-low" title="上传附件">
+<span class="material-symbols-outlined text-[20px]">attach_file</span>
+</button>
+</div>
+<button class="bg-primary text-on-primary rounded-lg px-lg py-xs flex items-center gap-xs text-label-md font-label-md font-medium hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm h-[36px]">
+<span class="material-symbols-outlined text-[18px]">send</span>
+                                发送
+                            </button>
+</div>
+</div>
+<!-- System Notice -->
+<p class="text-center text-label-sm font-label-sm text-outline mt-sm flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                        以上回答基于《人工智能导论》课程知识库生成，AI 可能会产生误差，请结合教材核实。
+                    </p>
+</div>
+</div>
+</section>
+<!-- Right Column: Reference Knowledge Base snippets -->
+<aside class="w-[300px] bg-surface-bright border-l border-outline-variant flex flex-col h-full flex-shrink-0">
+<div class="p-md border-b border-outline-variant bg-surface sticky top-0 flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]">hub</span>
+<h3 class="text-label-md font-label-md font-bold text-on-surface">知识溯源与关联</h3>
+</div>
+<div class="flex-1 overflow-y-auto p-md space-y-md">
+<!-- Source Snippet 1 -->
+<div class="bg-surface border border-outline-variant rounded-lg p-sm shadow-[0_2px_12px_0_rgba(0,0,0,0.02)] hover:border-primary/50 transition-colors cursor-pointer group">
+<div class="flex items-start justify-between mb-xs">
+<span class="text-label-sm font-label-sm font-medium text-primary bg-primary-fixed text-on-primary-fixed-variant px-xs py-[2px] rounded text-[10px]">课件引用</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-primary">open_in_new</span>
+</div>
+<h6 class="text-label-sm font-label-sm font-bold text-on-surface mb-xs truncate">第二章：神经网络基础.pdf</h6>
+<p class="text-body-sm font-body-sm text-on-surface-variant line-clamp-3 text-[12px] leading-relaxed">
+                        "...反向传播算法通过计算损失函数关于网络参数的梯度来优化模型。在实际应用中，我们通常结合随机梯度下降（SGD）或 Adam 优化器来加速收敛..."
+                    </p>
+<div class="mt-xs text-[11px] text-outline text-right">第 15 页</div>
+</div>
+<!-- Source Snippet 2 -->
+<div class="bg-surface border border-outline-variant rounded-lg p-sm shadow-[0_2px_12px_0_rgba(0,0,0,0.02)] hover:border-primary/50 transition-colors cursor-pointer group">
+<div class="flex items-start justify-between mb-xs">
+<span class="text-label-sm font-label-sm font-medium text-tertiary bg-tertiary-fixed text-on-tertiary-fixed-variant px-xs py-[2px] rounded text-[10px]">视频切片</span>
+<span class="material-symbols-outlined text-[14px] text-outline group-hover:text-primary">play_circle</span>
+</div>
+<h6 class="text-label-sm font-label-sm font-bold text-on-surface mb-xs truncate">Lecture 4: Backprop &amp; Neural Nets</h6>
+<div class="relative w-full h-[80px] bg-surface-container rounded overflow-hidden mb-xs mt-xs flex items-center justify-center border border-outline-variant">
+<!-- Simulated Video Thumbnail via gradient -->
+<div class="absolute inset-0 bg-gradient-to-br from-surface-variant to-outline-variant opacity-50"></div>
+<span class="material-symbols-outlined text-outline text-[32px] z-10">play_arrow</span>
+</div>
+<div class="mt-xs text-[11px] text-outline flex justify-between">
+<span>主讲人: 张教授</span>
+<span class="text-primary">24:15 - 28:30</span>
+</div>
+</div>
+<!-- Related Concepts -->
+<div class="mt-lg">
+<h5 class="text-label-sm font-label-sm font-bold text-on-surface-variant mb-sm uppercase tracking-wider text-[11px]">关联知识点图谱</h5>
+<div class="flex flex-wrap gap-xs">
+<span class="px-sm py-xs bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface hover:bg-surface-variant cursor-pointer transition-colors border border-outline-variant text-[12px]">链式法则</span>
+<span class="px-sm py-xs bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface hover:bg-surface-variant cursor-pointer transition-colors border border-outline-variant text-[12px]">梯度下降</span>
+<span class="px-sm py-xs bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface hover:bg-surface-variant cursor-pointer transition-colors border border-outline-variant text-[12px]">激活函数</span>
+<span class="px-sm py-xs bg-surface-container rounded-full text-label-sm font-label-sm text-on-surface hover:bg-surface-variant cursor-pointer transition-colors border border-outline-variant text-[12px]">损失函数</span>
+</div>
+</div>
+</div>
+</aside>
+</main>
+</body></html>
