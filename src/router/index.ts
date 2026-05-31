@@ -7,6 +7,7 @@ const layoutPages = [
   { path: 'resources', name: 'resources' },
   { path: 'chat', name: 'chat' },
   { path: 'evaluate', name: 'evaluate' },
+  { path: 'knowledge', name: 'knowledge' },
   { path: 'settings', name: 'settings' },
   { path: 'help', name: 'help' },
 ]
@@ -22,7 +23,13 @@ const router = createRouter({
         path: item.path,
         name: item.name,
         component: () =>
-          item.name === 'dashboard' ? import('@/views/DashboardView.vue') : import('@/views/BlankView.vue'),
+          item.name === 'dashboard'
+            ? import('@/views/DashboardView.vue')
+            : item.name === 'profile'
+              ? import('@/views/ProfileView.vue')
+              : item.name === 'knowledge'
+                ? import('@/views/KnowledgeView.vue')
+              : import('@/views/BlankView.vue'),
       })),
     },
     {

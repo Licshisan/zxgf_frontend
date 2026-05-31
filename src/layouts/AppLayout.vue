@@ -12,6 +12,7 @@ import {
   SettingIcon,
   TaskCheckedIcon,
   UserCircleIcon,
+  FolderIcon,
 } from 'tdesign-icons-vue-next'
 import logoUrl from '@/assets/logo.webp'
 import { useAuthStore } from '@/stores/auth'
@@ -28,6 +29,7 @@ const navItems = [
   { value: 'resources', label: '资源生成', icon: RobotIcon },
   { value: 'chat', label: 'AI 问答', icon: ChatBubbleLockedIcon },
   { value: 'evaluate', label: '测评中心', icon: TaskCheckedIcon },
+  { value: 'knowledge', label: '知识库', icon: FolderIcon },
 ]
 
 const pageTitles: Record<string, string> = {
@@ -36,6 +38,7 @@ const pageTitles: Record<string, string> = {
   resources: '资源生成',
   chat: 'AI 问答',
   evaluate: '测评中心',
+  knowledge: '知识库',
   settings: '系统设置',
   help: '帮助中心',
 }
@@ -73,7 +76,7 @@ function handleLogout() {
         </t-menu-item>
       </t-menu>
 
-      <div class="mt-auto border-t border-gray-200 pt-2 ">
+      <div class="mt-auto border-t border-gray-200 pt-2">
         <t-menu :value="activeMenu" @change="handleMenuChange">
           <t-menu-item value="settings">
             <template #icon><SettingIcon /></template>
@@ -118,7 +121,7 @@ function handleLogout() {
         </t-space>
       </t-header>
 
-      <t-content class="min-w-0 flex-1 overflow-y-auto bg-[#f7f9fc]">
+      <t-content class="app-scrollbar min-w-0 flex-1 overflow-y-auto bg-[#f7f9fc]">
         <router-view />
       </t-content>
     </t-layout>
