@@ -78,8 +78,14 @@ function setError(message: string) {
 }
 
 function finishLogin() {
-  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : '/'
-  router.replace(redirect)
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+
+  if (redirect) {
+    router.push(redirect)
+    return
+  }
+
+  router.push({ name: 'dashboard' })
 }
 
 function handleLogin() {

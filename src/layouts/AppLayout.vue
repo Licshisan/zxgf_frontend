@@ -131,8 +131,8 @@ watch(themeMode, applyTheme)
       <div class="flex items-center gap-3 px-4">
         <img :src="logoUrl" alt="智学工坊" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
         <div>
-          <h1 class="m-0 text-2xl font-semibold text-blue-600">智学工坊</h1>
-          <p class="m-0 text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">AI 学习空间</p>
+          <h1 class="m-0 text-xl font-semibold text-blue-600">智学工坊</h1>
+          <p class="m-0 text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">AI 学习智能体</p>
         </div>
       </div>
 

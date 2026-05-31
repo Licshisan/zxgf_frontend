@@ -1,46 +1,62 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 
-const layoutPages = [
-  { path: '', name: 'dashboard' },
-  { path: 'profile', name: 'profile' },
-  { path: 'resources', name: 'resources' },
-  { path: 'chat', name: 'chat' },
-  { path: 'evaluate', name: 'evaluate' },
-  { path: 'knowledge', name: 'knowledge' },
-  { path: 'settings', name: 'settings' },
-  { path: 'help', name: 'help' },
-]
-
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      component: () => import('@/layouts/AppLayout.vue'),
-      meta: { requiresAuth: true },
-      children: layoutPages.map((item) => ({
-        path: item.path,
-        name: item.name,
-        component: () =>
-          item.name === 'dashboard'
-            ? import('@/views/DashboardView.vue')
-            : item.name === 'profile'
-              ? import('@/views/ProfileView.vue')
-              : item.name === 'resources'
-                ? import('@/views/ResourcesView.vue')
-                : item.name === 'chat'
-                  ? import('@/views/ChatView.vue')
-                  : item.name === 'evaluate'
-                    ? import('@/views/EvaluateView.vue')
-                    : item.name === 'knowledge'
-                      ? import('@/views/KnowledgeView.vue')
-                      : import('@/views/BlankView.vue'),
-      })),
+      redirect: '/login',
     },
     {
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
+    },
+    {
+      path: '/',
+      component: () => import('@/layouts/AppLayout.vue'),
+      children: [
+        {
+          path: 'dashboard',
+          name: 'dashboard',
+          component: () => import('@/views/DashboardView.vue'),
+        },
+        {
+          path: 'profile',
+          name: 'profile',
+          component: () => import('@/views/ProfileView.vue'),
+        },
+        {
+          path: 'resources',
+          name: 'resources',
+          component: () => import('@/views/ResourcesView.vue'),
+        },
+        {
+          path: 'chat',
+          name: 'chat',
+          component: () => import('@/views/ChatView.vue'),
+        },
+        {
+          path: 'evaluate',
+          name: 'evaluate',
+          component: () => import('@/views/EvaluateView.vue'),
+        },
+        {
+          path: 'knowledge',
+          name: 'knowledge',
+          component: () => import('@/views/KnowledgeView.vue'),
+        },
+        {
+          path: 'settings',
+          name: 'settings',
+          component: () => import('@/views/BlankView.vue'),
+        },
+        {
+          path: 'help',
+          name: 'help',
+          component: () => import('@/views/BlankView.vue'),
+        },
+      ],
     },
   ],
 })
