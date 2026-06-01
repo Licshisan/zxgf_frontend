@@ -1,48 +1,39 @@
 # vue-project
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
 ## Project Setup
 
 ```sh
-npm install
+pnpm install
 ```
 
-### Compile and Hot-Reload for Development
+## Development
 
 ```sh
-npm run dev
+pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
+Frontend API requests should use the `/api` prefix. Vite proxies `/api` to `http://localhost:3000` and removes the `/api` prefix before forwarding.
+
+## Sync Backend APIs
+
+The backend Swagger UI is `http://localhost:3000/docs`, and the OpenAPI JSON is `http://localhost:3000/docs-json`.
 
 ```sh
-npm run build
+pnpm api:gen
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+This command uses Orval to generate API request functions and types into `src/api/generated/`. Run it again after backend API changes.
+
+Generated requests use `src/api/request.ts` as the shared request interceptor. It injects the local token, shows error messages, redirects to login on `401`, and shows a permission warning on `403`.
+
+## Build
 
 ```sh
-npm run lint
+pnpm build
+```
+
+## Lint
+
+```sh
+pnpm lint
 ```

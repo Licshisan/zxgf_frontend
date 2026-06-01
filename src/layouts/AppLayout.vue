@@ -135,7 +135,9 @@ watch(themeMode, applyTheme)
         <img :src="logoUrl" alt="智学工坊" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
         <div>
           <h1 class="m-0 text-xl font-semibold text-blue-600">智学工坊</h1>
-          <p class="m-0 text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">AI 学习智能体</p>
+          <p class="m-0 text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
+            AI 学习智能体
+          </p>
         </div>
       </div>
 
@@ -232,14 +234,22 @@ watch(themeMode, applyTheme)
             </div>
           </div>
 
-          <t-menu :value="activeMenu" :theme="themeMode" class="border-r-0" @change="handleMenuChange">
+          <t-menu
+            :value="activeMenu"
+            :theme="themeMode"
+            class="border-r-0"
+            @change="handleMenuChange"
+          >
             <t-menu-item v-for="item in navItems" :key="item.value" :value="item.value">
               <template #icon><component :is="item.icon" /></template>
               {{ item.label }}
             </t-menu-item>
           </t-menu>
 
-          <div class="mt-auto border-t pt-2" :class="isDark ? 'border-gray-800' : 'border-gray-200'">
+          <div
+            class="mt-auto border-t pt-2"
+            :class="isDark ? 'border-gray-800' : 'border-gray-200'"
+          >
             <t-menu :value="activeMenu" :theme="themeMode" @change="handleMenuChange">
               <t-menu-item value="settings">
                 <template #icon><SettingIcon /></template>

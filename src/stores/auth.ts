@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+import { AUTH_STORAGE_KEY } from '@/api/request'
+
 interface AuthUser {
   name: string
   email: string
@@ -16,39 +18,51 @@ interface RegisterPayload {
   password: string
 }
 
-const STORAGE_KEY = 'smart-learning-auth'
+interface StoredAuth {
+  user: AuthUser | null
+  token?: string
+}
 
-function readStoredUser(): AuthUser | null {
-  const raw = window.localStorage.getItem(STORAGE_KEY)
+function readStoredAuth(): StoredAuth | null {
+  const raw = window.localStorage.getItem(AUTH_STORAGE_KEY)
   if (!raw) return null
 
   try {
-    return JSON.parse(raw) as AuthUser
+    const parsed = JSON.parse(raw) as AuthUser | StoredAuth
+    if ('user' in parsed) return parsed
+    return { user: parsed }
   } catch {
-    window.localStorage.removeItem(STORAGE_KEY)
+    window.localStorage.removeItem(AUTH_STORAGE_KEY)
     return null
   }
 }
 
+const storedAuth = readStoredAuth()
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: readStoredUser() as AuthUser | null,
+    user: storedAuth?.user ?? null,
+    token: storedAuth?.token ?? '',
   }),
   getters: {
     isLoggedIn: (state) => Boolean(state.user),
   },
   actions: {
+    setSession(user: AuthUser, token?: string) {
+      this.user = user
+      this.token = token || ''
+      window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ user, token }))
+    },
     login(payload: LoginPayload) {
       const account = payload.account.trim()
       if (!account || !payload.password) {
         throw new Error('请输入账号和密码')
       }
 
-      this.user = {
+      this.setSession({
         name: account.includes('@') ? account.split('@')[0] || '学生用户' : account,
         email: account.includes('@') ? account : `${account}@demo.local`,
-      }
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(this.user))
+      })
     },
     register(payload: RegisterPayload) {
       const name = payload.name.trim()
@@ -57,12 +71,12 @@ export const useAuthStore = defineStore('auth', {
         throw new Error('请完整填写注册信息')
       }
 
-      this.user = { name, email }
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(this.user))
+      this.setSession({ name, email })
     },
     logout() {
       this.user = null
-      window.localStorage.removeItem(STORAGE_KEY)
+      this.token = ''
+      window.localStorage.removeItem(AUTH_STORAGE_KEY)
     },
   },
 })
