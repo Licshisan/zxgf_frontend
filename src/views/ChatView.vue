@@ -1,96 +1,96 @@
 <template>
-  <main class="grid h-full min-h-0 grid-cols-1 bg-[#f7f9fc] lg:grid-cols-[280px_minmax(0,1fr)]">
-    <aside class="hidden min-h-0 flex-col border-r border-gray-200 bg-white lg:flex">
-      <div class="border-b border-gray-200 p-4">
-        <h1 class="m-0 text-lg font-semibold text-gray-900">知识目录</h1>
-        <p class="mb-0 mt-1 text-xs text-gray-500">《人工智能导论》</p>
-        <t-input class="mt-3" size="small" placeholder="搜索知识点" clearable>
-          <template #prefixIcon><Icon icon="material-symbols:search" /></template>
-        </t-input>
+  <div class="flex h-full w-full min-h-0 flex-col overflow-hidden">
+    <div class="min-h-0 w-full flex-1 overflow-y-auto pt-4">
+      <div class="mx-auto w-full max-w-[860px]">
+        <t-chat-list ref="listRef" class="w-full" :clear-history="false">
+          <t-chat-message
+            v-for="message in messages"
+            :key="message.id"
+            :message="message"
+            :placement="message.role === 'user' ? 'right' : 'left'"
+            :variant="message.role === 'user' ? 'base' : 'text'"
+          />
+        </t-chat-list>
       </div>
+    </div>
 
-      <div class="app-scrollbar flex-1 overflow-y-auto p-3">
-        <t-collapse default-value="ml">
-          <t-collapse-panel value="overview" header="1. 概述与历史">
-            <div class="flex flex-col gap-1 text-sm text-gray-500">
-              <button class="catalog-item">1.1 人工智能定义</button>
-              <button class="catalog-item">1.2 发展阶段</button>
-            </div>
-          </t-collapse-panel>
-          <t-collapse-panel value="ml" header="2. 机器学习基础">
-            <div class="flex flex-col gap-1 text-sm">
-              <button class="catalog-item">2.1 监督学习与无监督学习</button>
-              <button class="catalog-item">2.2 线性回归与逻辑回归</button>
-              <button class="catalog-item active">2.3 神经网络初步</button>
-              <button class="catalog-item">2.4 支持向量机</button>
-            </div>
-          </t-collapse-panel>
-          <t-collapse-panel value="deep" header="3. 深度学习进阶">
-            <div class="flex flex-col gap-1 text-sm text-gray-500">
-              <button class="catalog-item">3.1 卷积神经网络</button>
-              <button class="catalog-item">3.2 循环神经网络</button>
-            </div>
-          </t-collapse-panel>
-        </t-collapse>
+    <div class="w-full shrink-0 pb-4">
+      <div class="mx-auto w-full max-w-[900px]">
+        <t-chat-sender
+          v-model="inputValue"
+          class="w-full"
+          placeholder="请输入内容，体验 AG-UI 协议"
+          :loading="status === 'pending' || status === 'streaming'"
+          @send="handleSend"
+          @stop="handleStop"
+        />
       </div>
-    </aside>
-
-    <section class="flex min-h-0 flex-col bg-white">
-      <div class="flex items-center justify-between border-b border-gray-200 px-5 py-3">
-        <t-space align="center">
-          <t-avatar shape="round" theme="primary">
-            <template #icon><Icon icon="material-symbols:forum" /></template>
-          </t-avatar>
-          <div>
-            <h2 class="m-0 text-lg font-semibold text-gray-900">AI 问答</h2>
-            <p class="m-0 text-xs text-gray-500">学习目标：掌握神经网络基础</p>
-          </div>
-        </t-space>
-        <t-tag theme="primary" variant="light">课程知识库问答</t-tag>
-      </div>
-
-      <t-chatbot class="min-h-0 flex-1" :chat-service-config="chatServiceConfig" />
-    </section>
-  </main>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
-import type { AIMessageContent, ChatServiceConfig, SSEChunkData } from '@tdesign-vue-next/chat'
+import { ref, onMounted } from 'vue'
+import {
+  type ChatRequestParams,
+  type TdChatListApi,
+  AGUIAdapter,
+  useChat,
+} from '@tdesign-vue-next/chat'
+import { MessagePlugin } from 'tdesign-vue-next'
 
-const chatServiceConfig: ChatServiceConfig = {
-  endpoint: 'https://1257786608-9i9j1kpa67.ap-guangzhou.tencentscf.com/sse/normal',
-  stream: true,
-  onMessage: (chunk: SSEChunkData): AIMessageContent => {
-    const { ...rest } = chunk.data as any
-    return {
-      type: 'markdown',
-      data: rest?.msg || '',
-    }
+const inputValue = ref<string>('')
+const listRef = ref<TdChatListApi | null>(null)
+
+const { chatEngine, messages, status } = useChat({
+  defaultMessages: [],
+  chatServiceConfig: {
+    endpoint: '/api/chat/stream',
+    protocol: 'agui',
+    stream: true,
+    onRequest: (params: ChatRequestParams) => ({
+      body: JSON.stringify({
+        uid: 'agui-demo',
+        prompt: params.prompt,
+      }),
+    }),
+    onStart: (chunk) => {
+      console.log('AG-UI 流式传输开始:', chunk)
+    },
+    onComplete: (aborted, params, event) => {
+      console.log('AG-UI 流式传输完成:', { aborted, event })
+    },
+    onError: (err) => {
+      console.error('AG-UI 错误:', err)
+    },
   },
+})
+
+onMounted(async () => {
+  try {
+    const response = await fetch(
+      'https://1257786608-9i9j1kpa67.ap-guangzhou.tencentscf.com/api/conversation/history?type=simple',
+    )
+    const result = await response.json()
+    if (result.success && result.data) {
+      const convertedMessages = AGUIAdapter.convertHistoryMessages(result.data)
+      chatEngine.value?.setMessages(convertedMessages)
+      listRef.value?.scrollList()
+    }
+  } catch (error) {
+    console.error('加载历史消息出错:', error)
+    MessagePlugin.error('加载历史消息出错')
+  }
+})
+
+// 发送消息
+const handleSend = async (params: string) => {
+  await chatEngine.value?.sendUserMessage({ prompt: params })
+  inputValue.value = ''
+}
+
+// 停止生成
+const handleStop = () => {
+  chatEngine.value?.abortChat()
 }
 </script>
-
-<style scoped>
-.catalog-item {
-  width: 100%;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  padding: 6px 8px;
-  color: #4b5563;
-  text-align: left;
-  cursor: pointer;
-}
-
-.catalog-item:hover {
-  background: #f3f4f6;
-  color: #0052d9;
-}
-
-.catalog-item.active {
-  background: #eff6ff;
-  color: #0052d9;
-  font-weight: 600;
-}
-</style>

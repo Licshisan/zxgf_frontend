@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0
  */
 
-export * from './chatStreamDto'
 export * from './loginDto'
 export * from './registerDto'
 export * from './registerDtoRole'

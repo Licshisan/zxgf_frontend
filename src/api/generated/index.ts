@@ -5,13 +5,7 @@
  * API documentation for Nest Project
  * OpenAPI spec version: 1.0
  */
-import type {
-  ChatStreamDto,
-  LoginDto,
-  RegisterDto,
-  ResetPasswordDto,
-  SendEmailCodeDto,
-} from './model'
+import type { LoginDto, RegisterDto, ResetPasswordDto, SendEmailCodeDto } from './model'
 
 import { request } from '../request'
 export type appControllerGetHelloResponse200 = {
@@ -286,38 +280,25 @@ export type chatControllerStreamResponse200 = {
   status: 200
 }
 
-export type chatControllerStreamResponse401 = {
-  data: void
-  status: 401
-}
-
 export type chatControllerStreamResponseSuccess = chatControllerStreamResponse200 & {
   headers: Headers
 }
-export type chatControllerStreamResponseError = chatControllerStreamResponse401 & {
-  headers: Headers
-}
 
-export type chatControllerStreamResponse =
-  | chatControllerStreamResponseSuccess
-  | chatControllerStreamResponseError
+export type chatControllerStreamResponse = chatControllerStreamResponseSuccess
 
 export const getChatControllerStreamUrl = () => {
   return `/api/chat/stream`
 }
 
 /**
- * 返回 SSE 流式数据，用于测试前端打字机效果。
- * @summary 流式聊天测试
+ * Accepts AG-UI RunAgentInput and returns AG-UI events over SSE.
+ * @summary AG-UI streaming chat
  */
 export const chatControllerStream = async (
-  chatStreamDto: ChatStreamDto,
   options?: RequestInit,
 ): Promise<chatControllerStreamResponse> => {
   return request<chatControllerStreamResponse>(getChatControllerStreamUrl(), {
     ...options,
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(chatStreamDto),
   })
 }

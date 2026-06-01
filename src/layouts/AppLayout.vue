@@ -28,14 +28,14 @@ const auth = useAuthStore()
 const themeMode = ref<ThemeMode>('light')
 const mobileMenuVisible = ref(false)
 
-const activeMenu = computed(() => String(route.name || 'dashboard'))
+const activeMenu = computed(() => String(route.name || 'chat'))
 const isDark = computed(() => themeMode.value === 'dark')
 
 const navItems = [
+  { value: 'chat', label: 'AI 问答', icon: ChatBubbleLockedIcon },
   { value: 'dashboard', label: '仪表盘', icon: DashboardIcon },
   { value: 'profile', label: '学习画像', icon: ChartAnalyticsIcon },
   { value: 'resources', label: '资源生成', icon: RobotIcon },
-  { value: 'chat', label: 'AI 问答', icon: ChatBubbleLockedIcon },
   { value: 'evaluate', label: '测评中心', icon: TaskCheckedIcon },
   { value: 'knowledge', label: '知识库', icon: FolderIcon },
 ]
@@ -51,7 +51,7 @@ const pageTitles: Record<string, string> = {
   help: '帮助中心',
 }
 
-const pageTitle = computed(() => pageTitles[activeMenu.value] || '仪表盘')
+const pageTitle = computed(() => pageTitles[activeMenu.value] || 'AI 问答')
 
 function applyTheme(mode: ThemeMode) {
   document.documentElement.classList.toggle('dark', mode === 'dark')
@@ -266,7 +266,7 @@ watch(themeMode, applyTheme)
 
       <t-content
         class="app-scrollbar min-w-0 flex-1 overflow-y-auto"
-        :class="isDark ? 'bg-[#101214]' : 'bg-[#f7f9fc]'"
+        :class="isDark ? 'bg-[#101214]' : 'bg-white'"
       >
         <router-view />
       </t-content>

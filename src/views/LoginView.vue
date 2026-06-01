@@ -166,7 +166,7 @@ async function handleLogin() {
     const session = parseSession(response.data, loginForm.account)
     auth.setSession(session.user, session.token, loginForm.remember)
     router.push(
-      (typeof route.query.redirect === 'string' && route.query.redirect) || { name: 'dashboard' },
+      (typeof route.query.redirect === 'string' && route.query.redirect) || { name: 'chat' },
     )
   } finally {
     loading.value = false
