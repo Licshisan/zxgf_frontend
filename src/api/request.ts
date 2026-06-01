@@ -27,7 +27,8 @@ type ApiResponse<T> = T extends { data: unknown; status: number; headers: Header
     }
 
 function getStoredToken(): string | null {
-  const raw = window.localStorage.getItem(AUTH_STORAGE_KEY)
+  const raw =
+    window.sessionStorage.getItem(AUTH_STORAGE_KEY) || window.localStorage.getItem(AUTH_STORAGE_KEY)
   if (!raw) return null
 
   try {
@@ -35,6 +36,7 @@ function getStoredToken(): string | null {
     return auth.token || auth.accessToken || auth.user?.token || auth.user?.accessToken || null
   } catch {
     window.localStorage.removeItem(AUTH_STORAGE_KEY)
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY)
     return null
   }
 }
@@ -66,6 +68,7 @@ async function parseBody(response: Response) {
 async function handleAuthError(status: number) {
   if (status === 401) {
     window.localStorage.removeItem(AUTH_STORAGE_KEY)
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY)
     MessagePlugin.warning('登录已过期，请重新登录')
 
     if (router.currentRoute.value.name !== 'login') {

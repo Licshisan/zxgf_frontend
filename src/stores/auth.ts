@@ -2,20 +2,12 @@ import { defineStore } from 'pinia'
 
 import { AUTH_STORAGE_KEY } from '@/api/request'
 
-interface AuthUser {
+export interface AuthUser {
+  id?: string | number
+  username?: string
   name: string
   email: string
-}
-
-interface LoginPayload {
-  account: string
-  password: string
-}
-
-interface RegisterPayload {
-  name: string
-  email: string
-  password: string
+  role?: string
 }
 
 interface StoredAuth {
@@ -24,7 +16,8 @@ interface StoredAuth {
 }
 
 function readStoredAuth(): StoredAuth | null {
-  const raw = window.localStorage.getItem(AUTH_STORAGE_KEY)
+  const raw =
+    window.sessionStorage.getItem(AUTH_STORAGE_KEY) || window.localStorage.getItem(AUTH_STORAGE_KEY)
   if (!raw) return null
 
   try {
@@ -33,6 +26,7 @@ function readStoredAuth(): StoredAuth | null {
     return { user: parsed }
   } catch {
     window.localStorage.removeItem(AUTH_STORAGE_KEY)
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY)
     return null
   }
 }
@@ -48,35 +42,19 @@ export const useAuthStore = defineStore('auth', {
     isLoggedIn: (state) => Boolean(state.user),
   },
   actions: {
-    setSession(user: AuthUser, token?: string) {
+    setSession(user: AuthUser, token?: string, remember = false) {
       this.user = user
       this.token = token || ''
-      window.localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ user, token }))
-    },
-    login(payload: LoginPayload) {
-      const account = payload.account.trim()
-      if (!account || !payload.password) {
-        throw new Error('请输入账号和密码')
-      }
-
-      this.setSession({
-        name: account.includes('@') ? account.split('@')[0] || '学生用户' : account,
-        email: account.includes('@') ? account : `${account}@demo.local`,
-      })
-    },
-    register(payload: RegisterPayload) {
-      const name = payload.name.trim()
-      const email = payload.email.trim()
-      if (!name || !email || !payload.password) {
-        throw new Error('请完整填写注册信息')
-      }
-
-      this.setSession({ name, email })
+      const storage = remember ? window.localStorage : window.sessionStorage
+      const staleStorage = remember ? window.sessionStorage : window.localStorage
+      storage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ user, token }))
+      staleStorage.removeItem(AUTH_STORAGE_KEY)
     },
     logout() {
       this.user = null
       this.token = ''
       window.localStorage.removeItem(AUTH_STORAGE_KEY)
+      window.sessionStorage.removeItem(AUTH_STORAGE_KEY)
     },
   },
 })

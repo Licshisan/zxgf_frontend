@@ -8,7 +8,7 @@
 
 export interface LoginDto {
   /** 用户名或邮箱 */
-  account: string;
+  account: string
   /** 密码 */
-  password: string;
+  password: string
 }

@@ -10,42 +10,33 @@ import type {
   LoginDto,
   RegisterDto,
   ResetPasswordDto,
-  SendEmailCodeDto
-} from './model';
+  SendEmailCodeDto,
+} from './model'
 
-import { request } from '../request';
+import { request } from '../request'
 export type appControllerGetHelloResponse200 = {
   data: void
   status: 200
 }
 
-export type appControllerGetHelloResponseSuccess = (appControllerGetHelloResponse200) & {
-  headers: Headers;
-};
-;
+export type appControllerGetHelloResponseSuccess = appControllerGetHelloResponse200 & {
+  headers: Headers
+}
 
-export type appControllerGetHelloResponse = (appControllerGetHelloResponseSuccess)
+export type appControllerGetHelloResponse = appControllerGetHelloResponseSuccess
 
 export const getAppControllerGetHelloUrl = () => {
-
-
-
-
   return `/api/`
 }
 
-export const appControllerGetHello = async ( options?: RequestInit): Promise<appControllerGetHelloResponse> => {
-
-  return request<appControllerGetHelloResponse>(getAppControllerGetHelloUrl(),
-  {
+export const appControllerGetHello = async (
+  options?: RequestInit,
+): Promise<appControllerGetHelloResponse> => {
+  return request<appControllerGetHelloResponse>(getAppControllerGetHelloUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
+    method: 'GET',
+  })
+}
 
 export type authControllerSendRegisterCodeResponse200 = {
   data: void
@@ -57,20 +48,20 @@ export type authControllerSendRegisterCodeResponse409 = {
   status: 409
 }
 
-export type authControllerSendRegisterCodeResponseSuccess = (authControllerSendRegisterCodeResponse200) & {
-  headers: Headers;
-};
-export type authControllerSendRegisterCodeResponseError = (authControllerSendRegisterCodeResponse409) & {
-  headers: Headers;
-};
+export type authControllerSendRegisterCodeResponseSuccess =
+  authControllerSendRegisterCodeResponse200 & {
+    headers: Headers
+  }
+export type authControllerSendRegisterCodeResponseError =
+  authControllerSendRegisterCodeResponse409 & {
+    headers: Headers
+  }
 
-export type authControllerSendRegisterCodeResponse = (authControllerSendRegisterCodeResponseSuccess | authControllerSendRegisterCodeResponseError)
+export type authControllerSendRegisterCodeResponse =
+  | authControllerSendRegisterCodeResponseSuccess
+  | authControllerSendRegisterCodeResponseError
 
 export const getAuthControllerSendRegisterCodeUrl = () => {
-
-
-
-
   return `/api/auth/send-register-code`
 }
 
@@ -78,18 +69,17 @@ export const getAuthControllerSendRegisterCodeUrl = () => {
  * 向未注册邮箱发送 6 位验证码，验证码 10 分钟内有效。
  * @summary 发送注册验证码
  */
-export const authControllerSendRegisterCode = async (sendEmailCodeDto: SendEmailCodeDto, options?: RequestInit): Promise<authControllerSendRegisterCodeResponse> => {
-
-  return request<authControllerSendRegisterCodeResponse>(getAuthControllerSendRegisterCodeUrl(),
-  {
+export const authControllerSendRegisterCode = async (
+  sendEmailCodeDto: SendEmailCodeDto,
+  options?: RequestInit,
+): Promise<authControllerSendRegisterCodeResponse> => {
+  return request<authControllerSendRegisterCodeResponse>(getAuthControllerSendRegisterCodeUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(sendEmailCodeDto)
-  }
-);}
-
-
+    body: JSON.stringify(sendEmailCodeDto),
+  })
+}
 
 export type authControllerRegisterResponse200 = {
   data: void
@@ -106,20 +96,21 @@ export type authControllerRegisterResponse409 = {
   status: 409
 }
 
-export type authControllerRegisterResponseSuccess = (authControllerRegisterResponse200) & {
-  headers: Headers;
-};
-export type authControllerRegisterResponseError = (authControllerRegisterResponse400 | authControllerRegisterResponse409) & {
-  headers: Headers;
-};
+export type authControllerRegisterResponseSuccess = authControllerRegisterResponse200 & {
+  headers: Headers
+}
+export type authControllerRegisterResponseError = (
+  | authControllerRegisterResponse400
+  | authControllerRegisterResponse409
+) & {
+  headers: Headers
+}
 
-export type authControllerRegisterResponse = (authControllerRegisterResponseSuccess | authControllerRegisterResponseError)
+export type authControllerRegisterResponse =
+  | authControllerRegisterResponseSuccess
+  | authControllerRegisterResponseError
 
 export const getAuthControllerRegisterUrl = () => {
-
-
-
-
   return `/api/auth/register`
 }
 
@@ -127,18 +118,17 @@ export const getAuthControllerRegisterUrl = () => {
  * 使用邮箱验证码注册学生或老师账号，普通注册不能创建管理员。
  * @summary 注册账号
  */
-export const authControllerRegister = async (registerDto: RegisterDto, options?: RequestInit): Promise<authControllerRegisterResponse> => {
-
-  return request<authControllerRegisterResponse>(getAuthControllerRegisterUrl(),
-  {
+export const authControllerRegister = async (
+  registerDto: RegisterDto,
+  options?: RequestInit,
+): Promise<authControllerRegisterResponse> => {
+  return request<authControllerRegisterResponse>(getAuthControllerRegisterUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(registerDto)
-  }
-);}
-
-
+    body: JSON.stringify(registerDto),
+  })
+}
 
 export type authControllerLoginResponse200 = {
   data: void
@@ -150,20 +140,18 @@ export type authControllerLoginResponse401 = {
   status: 401
 }
 
-export type authControllerLoginResponseSuccess = (authControllerLoginResponse200) & {
-  headers: Headers;
-};
-export type authControllerLoginResponseError = (authControllerLoginResponse401) & {
-  headers: Headers;
-};
+export type authControllerLoginResponseSuccess = authControllerLoginResponse200 & {
+  headers: Headers
+}
+export type authControllerLoginResponseError = authControllerLoginResponse401 & {
+  headers: Headers
+}
 
-export type authControllerLoginResponse = (authControllerLoginResponseSuccess | authControllerLoginResponseError)
+export type authControllerLoginResponse =
+  | authControllerLoginResponseSuccess
+  | authControllerLoginResponseError
 
 export const getAuthControllerLoginUrl = () => {
-
-
-
-
   return `/api/auth/login`
 }
 
@@ -171,36 +159,30 @@ export const getAuthControllerLoginUrl = () => {
  * 支持使用用户名或邮箱登录，成功后返回访问令牌。
  * @summary 登录
  */
-export const authControllerLogin = async (loginDto: LoginDto, options?: RequestInit): Promise<authControllerLoginResponse> => {
-
-  return request<authControllerLoginResponse>(getAuthControllerLoginUrl(),
-  {
+export const authControllerLogin = async (
+  loginDto: LoginDto,
+  options?: RequestInit,
+): Promise<authControllerLoginResponse> => {
+  return request<authControllerLoginResponse>(getAuthControllerLoginUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(loginDto)
-  }
-);}
-
-
+    body: JSON.stringify(loginDto),
+  })
+}
 
 export type authControllerSendResetCodeResponse200 = {
   data: void
   status: 200
 }
 
-export type authControllerSendResetCodeResponseSuccess = (authControllerSendResetCodeResponse200) & {
-  headers: Headers;
-};
-;
+export type authControllerSendResetCodeResponseSuccess = authControllerSendResetCodeResponse200 & {
+  headers: Headers
+}
 
-export type authControllerSendResetCodeResponse = (authControllerSendResetCodeResponseSuccess)
+export type authControllerSendResetCodeResponse = authControllerSendResetCodeResponseSuccess
 
 export const getAuthControllerSendResetCodeUrl = () => {
-
-
-
-
   return `/api/auth/send-reset-code`
 }
 
@@ -208,18 +190,17 @@ export const getAuthControllerSendResetCodeUrl = () => {
  * 向已注册邮箱发送 6 位验证码。为避免枚举邮箱，接口返回统一成功信息。
  * @summary 发送找回密码验证码
  */
-export const authControllerSendResetCode = async (sendEmailCodeDto: SendEmailCodeDto, options?: RequestInit): Promise<authControllerSendResetCodeResponse> => {
-
-  return request<authControllerSendResetCodeResponse>(getAuthControllerSendResetCodeUrl(),
-  {
+export const authControllerSendResetCode = async (
+  sendEmailCodeDto: SendEmailCodeDto,
+  options?: RequestInit,
+): Promise<authControllerSendResetCodeResponse> => {
+  return request<authControllerSendResetCodeResponse>(getAuthControllerSendResetCodeUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(sendEmailCodeDto)
-  }
-);}
-
-
+    body: JSON.stringify(sendEmailCodeDto),
+  })
+}
 
 export type authControllerResetPasswordResponse200 = {
   data: void
@@ -231,20 +212,18 @@ export type authControllerResetPasswordResponse400 = {
   status: 400
 }
 
-export type authControllerResetPasswordResponseSuccess = (authControllerResetPasswordResponse200) & {
-  headers: Headers;
-};
-export type authControllerResetPasswordResponseError = (authControllerResetPasswordResponse400) & {
-  headers: Headers;
-};
+export type authControllerResetPasswordResponseSuccess = authControllerResetPasswordResponse200 & {
+  headers: Headers
+}
+export type authControllerResetPasswordResponseError = authControllerResetPasswordResponse400 & {
+  headers: Headers
+}
 
-export type authControllerResetPasswordResponse = (authControllerResetPasswordResponseSuccess | authControllerResetPasswordResponseError)
+export type authControllerResetPasswordResponse =
+  | authControllerResetPasswordResponseSuccess
+  | authControllerResetPasswordResponseError
 
 export const getAuthControllerResetPasswordUrl = () => {
-
-
-
-
   return `/api/auth/reset-password`
 }
 
@@ -252,18 +231,17 @@ export const getAuthControllerResetPasswordUrl = () => {
  * 使用邮箱验证码设置新密码。
  * @summary 重置密码
  */
-export const authControllerResetPassword = async (resetPasswordDto: ResetPasswordDto, options?: RequestInit): Promise<authControllerResetPasswordResponse> => {
-
-  return request<authControllerResetPasswordResponse>(getAuthControllerResetPasswordUrl(),
-  {
+export const authControllerResetPassword = async (
+  resetPasswordDto: ResetPasswordDto,
+  options?: RequestInit,
+): Promise<authControllerResetPasswordResponse> => {
+  return request<authControllerResetPasswordResponse>(getAuthControllerResetPasswordUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(resetPasswordDto)
-  }
-);}
-
-
+    body: JSON.stringify(resetPasswordDto),
+  })
+}
 
 export type authControllerMeResponse200 = {
   data: void
@@ -275,20 +253,18 @@ export type authControllerMeResponse401 = {
   status: 401
 }
 
-export type authControllerMeResponseSuccess = (authControllerMeResponse200) & {
-  headers: Headers;
-};
-export type authControllerMeResponseError = (authControllerMeResponse401) & {
-  headers: Headers;
-};
+export type authControllerMeResponseSuccess = authControllerMeResponse200 & {
+  headers: Headers
+}
+export type authControllerMeResponseError = authControllerMeResponse401 & {
+  headers: Headers
+}
 
-export type authControllerMeResponse = (authControllerMeResponseSuccess | authControllerMeResponseError)
+export type authControllerMeResponse =
+  | authControllerMeResponseSuccess
+  | authControllerMeResponseError
 
 export const getAuthControllerMeUrl = () => {
-
-
-
-
   return `/api/auth/me`
 }
 
@@ -296,18 +272,14 @@ export const getAuthControllerMeUrl = () => {
  * 根据 Bearer Token 返回当前登录用户信息。
  * @summary 获取当前用户
  */
-export const authControllerMe = async ( options?: RequestInit): Promise<authControllerMeResponse> => {
-
-  return request<authControllerMeResponse>(getAuthControllerMeUrl(),
-  {
+export const authControllerMe = async (
+  options?: RequestInit,
+): Promise<authControllerMeResponse> => {
+  return request<authControllerMeResponse>(getAuthControllerMeUrl(), {
     ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
+    method: 'GET',
+  })
+}
 
 export type chatControllerStreamResponse200 = {
   data: void
@@ -319,20 +291,18 @@ export type chatControllerStreamResponse401 = {
   status: 401
 }
 
-export type chatControllerStreamResponseSuccess = (chatControllerStreamResponse200) & {
-  headers: Headers;
-};
-export type chatControllerStreamResponseError = (chatControllerStreamResponse401) & {
-  headers: Headers;
-};
+export type chatControllerStreamResponseSuccess = chatControllerStreamResponse200 & {
+  headers: Headers
+}
+export type chatControllerStreamResponseError = chatControllerStreamResponse401 & {
+  headers: Headers
+}
 
-export type chatControllerStreamResponse = (chatControllerStreamResponseSuccess | chatControllerStreamResponseError)
+export type chatControllerStreamResponse =
+  | chatControllerStreamResponseSuccess
+  | chatControllerStreamResponseError
 
 export const getChatControllerStreamUrl = () => {
-
-
-
-
   return `/api/chat/stream`
 }
 
@@ -340,13 +310,14 @@ export const getChatControllerStreamUrl = () => {
  * 返回 SSE 流式数据，用于测试前端打字机效果。
  * @summary 流式聊天测试
  */
-export const chatControllerStream = async (chatStreamDto: ChatStreamDto, options?: RequestInit): Promise<chatControllerStreamResponse> => {
-
-  return request<chatControllerStreamResponse>(getChatControllerStreamUrl(),
-  {
+export const chatControllerStream = async (
+  chatStreamDto: ChatStreamDto,
+  options?: RequestInit,
+): Promise<chatControllerStreamResponse> => {
+  return request<chatControllerStreamResponse>(getChatControllerStreamUrl(), {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(chatStreamDto)
-  }
-);}
+    body: JSON.stringify(chatStreamDto),
+  })
+}

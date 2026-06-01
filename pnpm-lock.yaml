@@ -20,6 +20,9 @@ importers:
       echarts:
         specifier: ^6.1.0
         version: 6.1.0
+      orval:
+        specifier: ^8.14.0
+        version: 8.14.0(typescript@6.0.3)
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@6.0.3)(vue@3.5.35(typescript@6.0.3))
@@ -69,9 +72,6 @@ importers:
       npm-run-all2:
         specifier: ^8.0.4
         version: 8.0.4
-      orval:
-        specifier: ^8.14.0
-        version: 8.14.0(typescript@6.0.3)
       oxfmt:
         specifier: ^0.45.0
         version: 0.45.0

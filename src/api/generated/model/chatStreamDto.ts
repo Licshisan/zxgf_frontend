@@ -8,8 +8,8 @@
 
 export interface ChatStreamDto {
   /**
-     * 用户输入的消息
-     * @maxLength 2000
-     */
-  message: string;
+   * 用户输入的消息
+   * @maxLength 2000
+   */
+  message: string
 }

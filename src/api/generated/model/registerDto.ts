@@ -5,29 +5,29 @@
  * API documentation for Nest Project
  * OpenAPI spec version: 1.0
  */
-import type { RegisterDtoRole } from './registerDtoRole';
+import type { RegisterDtoRole } from './registerDtoRole'
 
 export interface RegisterDto {
   /**
-     * 用户名，仅支持字母、数字、下划线和短横线
-     * @minLength 3
-     * @maxLength 64
-     */
-  username: string;
+   * 用户名，仅支持字母、数字、下划线和短横线
+   * @minLength 3
+   * @maxLength 64
+   */
+  username: string
   /** 邮箱，用于登录和接收验证码 */
-  email: string;
+  email: string
   /**
-     * 密码，至少 8 位且包含字母和数字
-     * @minLength 8
-     */
-  password: string;
+   * 密码，至少 8 位且包含字母和数字
+   * @minLength 8
+   */
+  password: string
   /** 注册邮箱验证码 */
-  code: string;
+  code: string
   /** 用户身份，默认学生 */
-  role?: RegisterDtoRole;
+  role?: RegisterDtoRole
   /**
-     * 显示名称
-     * @maxLength 100
-     */
-  displayName?: string;
+   * 显示名称
+   * @maxLength 100
+   */
+  displayName?: string
 }

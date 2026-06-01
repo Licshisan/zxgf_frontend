@@ -8,12 +8,12 @@
 
 export interface ResetPasswordDto {
   /** 已注册邮箱 */
-  email: string;
+  email: string
   /** 找回密码验证码 */
-  code: string;
+  code: string
   /**
-     * 新密码，至少 8 位且包含字母和数字
-     * @minLength 8
-     */
-  newPassword: string;
+   * 新密码，至少 8 位且包含字母和数字
+   * @minLength 8
+   */
+  newPassword: string
 }

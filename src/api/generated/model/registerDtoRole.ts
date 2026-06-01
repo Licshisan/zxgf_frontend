@@ -9,10 +9,9 @@
 /**
  * 用户身份，默认学生
  */
-export type RegisterDtoRole = typeof RegisterDtoRole[keyof typeof RegisterDtoRole];
-
+export type RegisterDtoRole = (typeof RegisterDtoRole)[keyof typeof RegisterDtoRole]
 
 export const RegisterDtoRole = {
   STUDENT: 'STUDENT',
   TEACHER: 'TEACHER',
-} as const;
+} as const

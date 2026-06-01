@@ -8,5 +8,5 @@
 
 export interface SendEmailCodeDto {
   /** 接收验证码的邮箱 */
-  email: string;
+  email: string
 }
