@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full w-full min-h-0 flex-col overflow-hidden px-1">
     <t-chat-list ref="listRef" class="chat-list" :clear-history="false">
-        <div class="mx-auto w-full max-w-[860px] pt-4">
+      <div class="mx-auto w-full max-w-[860px] pt-4">
         <t-chat-message
           v-for="message in messages"
           :key="message.id"
@@ -9,7 +9,13 @@
           :placement="message.role === 'user' ? 'right' : 'left'"
           :variant="message.role === 'user' ? 'base' : 'text'"
           :handle-actions="{
-            suggestion: ({ content }) => handleSuggestionClick(content.prompt),
+            suggestion: ({
+              content,
+            }: {
+              content: {
+                prompt: string
+              }
+            }) => handleSuggestionClick(content.prompt),
           }"
         />
       </div>
@@ -74,7 +80,7 @@ const defaultMessages: ChatMessagesData[] = [
       },
     ],
   },
-];
+]
 
 const { chatEngine, messages, status } = useChat({
   defaultMessages,
@@ -84,14 +90,17 @@ const { chatEngine, messages, status } = useChat({
     stream: true,
     onRequest: (params: ChatRequestParams) => {
       console.log('请求参数:', messages.value)
-      const newMessages = [...messages.value, { role: 'user', content: [{ type: 'text', data: params.prompt }] }]
+      const newMessages = [
+        ...messages.value,
+        { role: 'user', content: [{ type: 'text', data: params.prompt }] },
+      ]
       return {
         body: JSON.stringify({
           uid: 'agui-demo',
-          messages: newMessages
+          messages: newMessages,
         }),
       }
-    }
+    },
   },
 })
 
@@ -122,8 +131,8 @@ const handleSend = async (params: string) => {
 
 // 点击建议问题
 const handleSuggestionClick = (prompt: string) => {
-  inputValue.value = prompt;
-};
+  inputValue.value = prompt
+}
 
 // 停止生成
 const handleStop = () => {
