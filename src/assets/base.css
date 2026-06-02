@@ -28,8 +28,8 @@ a {
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 6px !important;
+  height: 6px !important;
 }
 
 ::-webkit-scrollbar-button {
@@ -39,14 +39,14 @@ a {
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent !important;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d0d0d0;
-  border-radius: 3px;
+  background: #d0d0d0 !important;
+  border-radius: 3px !important;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a9a9a9;
+  background: #a9a9a9 !important;
 }

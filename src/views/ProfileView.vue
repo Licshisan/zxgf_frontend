@@ -1,7 +1,7 @@
 <template>
   <main class="grid h-full min-h-0 grid-cols-1 bg-[#f7f9fc] lg:grid-cols-[minmax(0,1fr)_420px]">
     <section class="min-h-0 bg-white">
-      <t-chatbot class="h-full" :chat-service-config="chatServiceConfig" />
+      <t-chatbot class="h-full" />
     </section>
 
     <aside class="flex min-h-0 flex-col border-l border-gray-200 bg-white">
@@ -79,7 +79,6 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import type { SSEChunkData, AIMessageContent, ChatServiceConfig } from '@tdesign-vue-next/chat'
 
 /**
  * 快速开始示例
@@ -118,20 +117,4 @@ const portraitCards = [
 ]
 
 const skillTags = ['Python', '算法基础', '项目实践', '可视化学习']
-
-// 聊天服务配置
-const chatServiceConfig: ChatServiceConfig = {
-  // 对话服务地址
-  endpoint: 'https://1257786608-9i9j1kpa67.ap-guangzhou.tencentscf.com/sse/normal',
-  // 开启流式传输
-  stream: true,
-  // 解析后端返回的数据，转换为组件所需格式
-  onMessage: (chunk: SSEChunkData): AIMessageContent => {
-    const { ...rest } = chunk.data as any
-    return {
-      type: 'markdown',
-      data: rest?.msg || '',
-    }
-  },
-}
 </script>

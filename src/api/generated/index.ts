@@ -8,30 +8,6 @@
 import type { LoginDto, RegisterDto, ResetPasswordDto, SendEmailCodeDto } from './model'
 
 import { request } from '../request'
-export type appControllerGetHelloResponse200 = {
-  data: void
-  status: 200
-}
-
-export type appControllerGetHelloResponseSuccess = appControllerGetHelloResponse200 & {
-  headers: Headers
-}
-
-export type appControllerGetHelloResponse = appControllerGetHelloResponseSuccess
-
-export const getAppControllerGetHelloUrl = () => {
-  return `/api/`
-}
-
-export const appControllerGetHello = async (
-  options?: RequestInit,
-): Promise<appControllerGetHelloResponse> => {
-  return request<appControllerGetHelloResponse>(getAppControllerGetHelloUrl(), {
-    ...options,
-    method: 'GET',
-  })
-}
-
 export type authControllerSendRegisterCodeResponse200 = {
   data: void
   status: 200
@@ -275,30 +251,56 @@ export const authControllerMe = async (
   })
 }
 
-export type chatControllerStreamResponse200 = {
+export type chatControllerResponse200 = {
   data: void
   status: 200
 }
 
-export type chatControllerStreamResponseSuccess = chatControllerStreamResponse200 & {
+export type chatControllerResponseSuccess = chatControllerResponse200 & {
   headers: Headers
 }
 
-export type chatControllerStreamResponse = chatControllerStreamResponseSuccess
+export type chatControllerResponse = chatControllerResponseSuccess
 
-export const getChatControllerStreamUrl = () => {
-  return `/api/chat/stream`
+export const getChatControllerUrl = () => {
+  return `/api/chat/chat`
 }
 
 /**
- * Accepts AG-UI RunAgentInput and returns AG-UI events over SSE.
- * @summary AG-UI streaming chat
+ * 接收 AG-UI RunAgentInput，并通过 SSE 返回大模型 AG-UI 事件流。
+ * @summary AG-UI 大模型流式对话
  */
-export const chatControllerStream = async (
-  options?: RequestInit,
-): Promise<chatControllerStreamResponse> => {
-  return request<chatControllerStreamResponse>(getChatControllerStreamUrl(), {
+export const chatController = async (options?: RequestInit): Promise<chatControllerResponse> => {
+  return request<chatControllerResponse>(getChatControllerUrl(), {
     ...options,
     method: 'POST',
+  })
+}
+
+export type profileControllerMeResponse200 = {
+  data: void
+  status: 200
+}
+
+export type profileControllerMeResponseSuccess = profileControllerMeResponse200 & {
+  headers: Headers
+}
+
+export type profileControllerMeResponse = profileControllerMeResponseSuccess
+
+export const getProfileControllerMeUrl = () => {
+  return `/api/profile/me`
+}
+
+/**
+ * 返回当前登录用户的六维画像；如果尚未生成，则返回空画像结构。
+ * @summary 读取当前用户画像
+ */
+export const profileControllerMe = async (
+  options?: RequestInit,
+): Promise<profileControllerMeResponse> => {
+  return request<profileControllerMeResponse>(getProfileControllerMeUrl(), {
+    ...options,
+    method: 'GET',
   })
 }
