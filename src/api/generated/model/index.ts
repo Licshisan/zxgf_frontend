@@ -6,8 +6,12 @@
  * OpenAPI spec version: 1.0
  */
 
+export * from './createSessionDto'
+export * from './generateLearningDocumentDto'
 export * from './loginDto'
 export * from './registerDto'
 export * from './registerDtoRole'
 export * from './resetPasswordDto'
 export * from './sendEmailCodeDto'
+export * from './updateProfileDto'
+export * from './updateSessionDto'

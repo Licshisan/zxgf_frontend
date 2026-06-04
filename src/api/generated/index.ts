@@ -5,7 +5,16 @@
  * API documentation for Nest Project
  * OpenAPI spec version: 1.0
  */
-import type { LoginDto, RegisterDto, ResetPasswordDto, SendEmailCodeDto } from './model'
+import type {
+  CreateSessionDto,
+  GenerateLearningDocumentDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+  SendEmailCodeDto,
+  UpdateProfileDto,
+  UpdateSessionDto,
+} from './model'
 
 import { request } from '../request'
 export type authControllerSendRegisterCodeResponse200 = {
@@ -263,11 +272,11 @@ export type chatControllerResponseSuccess = chatControllerResponse200 & {
 export type chatControllerResponse = chatControllerResponseSuccess
 
 export const getChatControllerUrl = () => {
-  return `/api/chat/chat`
+  return `/api/chat/stream`
 }
 
 /**
- * 接收 AG-UI RunAgentInput，并通过 SSE 返回大模型 AG-UI 事件流。
+ * 接收带 sessionId 的 AG-UI RunAgentInput，后端加载会话历史并通过 SSE 返回 AG-UI 事件流。
  * @summary AG-UI 大模型流式对话
  */
 export const chatController = async (options?: RequestInit): Promise<chatControllerResponse> => {
@@ -303,4 +312,379 @@ export const profileControllerMe = async (
     ...options,
     method: 'GET',
   })
+}
+
+export type profileControllerUpdateMeResponse200 = {
+  data: void
+  status: 200
+}
+
+export type profileControllerUpdateMeResponseSuccess = profileControllerUpdateMeResponse200 & {
+  headers: Headers
+}
+
+export type profileControllerUpdateMeResponse = profileControllerUpdateMeResponseSuccess
+
+export const getProfileControllerUpdateMeUrl = () => {
+  return `/api/profile/me`
+}
+
+/**
+ * 提交用户画像局部维度，服务端会与当前画像合并后保存。
+ * @summary 增量更新当前用户画像
+ */
+export const profileControllerUpdateMe = async (
+  updateProfileDto: UpdateProfileDto,
+  options?: RequestInit,
+): Promise<profileControllerUpdateMeResponse> => {
+  return request<profileControllerUpdateMeResponse>(getProfileControllerUpdateMeUrl(), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateProfileDto),
+  })
+}
+
+export type sessionControllerCreateSessionResponse200 = {
+  data: void
+  status: 200
+}
+
+export type sessionControllerCreateSessionResponseSuccess =
+  sessionControllerCreateSessionResponse200 & {
+    headers: Headers
+  }
+
+export type sessionControllerCreateSessionResponse = sessionControllerCreateSessionResponseSuccess
+
+export const getSessionControllerCreateSessionUrl = () => {
+  return `/api/sessions`
+}
+
+/**
+ * @summary 新建会话
+ */
+export const sessionControllerCreateSession = async (
+  createSessionDto: CreateSessionDto,
+  options?: RequestInit,
+): Promise<sessionControllerCreateSessionResponse> => {
+  return request<sessionControllerCreateSessionResponse>(getSessionControllerCreateSessionUrl(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createSessionDto),
+  })
+}
+
+export type sessionControllerListMySessionsResponse200 = {
+  data: void
+  status: 200
+}
+
+export type sessionControllerListMySessionsResponseSuccess =
+  sessionControllerListMySessionsResponse200 & {
+    headers: Headers
+  }
+
+export type sessionControllerListMySessionsResponse = sessionControllerListMySessionsResponseSuccess
+
+export const getSessionControllerListMySessionsUrl = () => {
+  return `/api/sessions`
+}
+
+/**
+ * @summary 查询当前用户会话列表
+ */
+export const sessionControllerListMySessions = async (
+  options?: RequestInit,
+): Promise<sessionControllerListMySessionsResponse> => {
+  return request<sessionControllerListMySessionsResponse>(getSessionControllerListMySessionsUrl(), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export type sessionControllerGetMySessionResponse200 = {
+  data: void
+  status: 200
+}
+
+export type sessionControllerGetMySessionResponseSuccess =
+  sessionControllerGetMySessionResponse200 & {
+    headers: Headers
+  }
+
+export type sessionControllerGetMySessionResponse = sessionControllerGetMySessionResponseSuccess
+
+export const getSessionControllerGetMySessionUrl = (id: string) => {
+  return `/api/sessions/${id}`
+}
+
+/**
+ * @summary 打开会话并获取历史消息
+ */
+export const sessionControllerGetMySession = async (
+  id: string,
+  options?: RequestInit,
+): Promise<sessionControllerGetMySessionResponse> => {
+  return request<sessionControllerGetMySessionResponse>(getSessionControllerGetMySessionUrl(id), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export type sessionControllerUpdateSessionResponse200 = {
+  data: void
+  status: 200
+}
+
+export type sessionControllerUpdateSessionResponseSuccess =
+  sessionControllerUpdateSessionResponse200 & {
+    headers: Headers
+  }
+
+export type sessionControllerUpdateSessionResponse = sessionControllerUpdateSessionResponseSuccess
+
+export const getSessionControllerUpdateSessionUrl = (id: string) => {
+  return `/api/sessions/${id}`
+}
+
+/**
+ * @summary 更新会话信息
+ */
+export const sessionControllerUpdateSession = async (
+  id: string,
+  updateSessionDto: UpdateSessionDto,
+  options?: RequestInit,
+): Promise<sessionControllerUpdateSessionResponse> => {
+  return request<sessionControllerUpdateSessionResponse>(getSessionControllerUpdateSessionUrl(id), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateSessionDto),
+  })
+}
+
+export type sessionControllerDeleteSessionResponse200 = {
+  data: void
+  status: 200
+}
+
+export type sessionControllerDeleteSessionResponseSuccess =
+  sessionControllerDeleteSessionResponse200 & {
+    headers: Headers
+  }
+
+export type sessionControllerDeleteSessionResponse = sessionControllerDeleteSessionResponseSuccess
+
+export const getSessionControllerDeleteSessionUrl = (id: string) => {
+  return `/api/sessions/${id}`
+}
+
+/**
+ * @summary 删除会话
+ */
+export const sessionControllerDeleteSession = async (
+  id: string,
+  options?: RequestInit,
+): Promise<sessionControllerDeleteSessionResponse> => {
+  return request<sessionControllerDeleteSessionResponse>(getSessionControllerDeleteSessionUrl(id), {
+    ...options,
+    method: 'DELETE',
+  })
+}
+
+export type taskLogControllerListMyTasksResponse200 = {
+  data: void
+  status: 200
+}
+
+export type taskLogControllerListMyTasksResponseSuccess =
+  taskLogControllerListMyTasksResponse200 & {
+    headers: Headers
+  }
+
+export type taskLogControllerListMyTasksResponse = taskLogControllerListMyTasksResponseSuccess
+
+export const getTaskLogControllerListMyTasksUrl = () => {
+  return `/api/agent-task-logs/my`
+}
+
+/**
+ * 分页返回当前登录用户的智能体任务日志，支持按状态、任务类型和智能体名称过滤。
+ * @summary 查询当前用户智能体任务日志
+ */
+export const taskLogControllerListMyTasks = async (
+  options?: RequestInit,
+): Promise<taskLogControllerListMyTasksResponse> => {
+  return request<taskLogControllerListMyTasksResponse>(getTaskLogControllerListMyTasksUrl(), {
+    ...options,
+    method: 'GET',
+  })
+}
+
+export type resourceAgentControllerGenerateLearningDocumentResponse200 = {
+  data: void
+  status: 200
+}
+
+export type resourceAgentControllerGenerateLearningDocumentResponseSuccess =
+  resourceAgentControllerGenerateLearningDocumentResponse200 & {
+    headers: Headers
+  }
+
+export type resourceAgentControllerGenerateLearningDocumentResponse =
+  resourceAgentControllerGenerateLearningDocumentResponseSuccess
+
+export const getResourceAgentControllerGenerateLearningDocumentUrl = () => {
+  return `/api/resource-agent/learning-documents/generate`
+}
+
+/**
+ * @summary 生成学习文档资源
+ */
+export const resourceAgentControllerGenerateLearningDocument = async (
+  generateLearningDocumentDto: GenerateLearningDocumentDto,
+  options?: RequestInit,
+): Promise<resourceAgentControllerGenerateLearningDocumentResponse> => {
+  return request<resourceAgentControllerGenerateLearningDocumentResponse>(
+    getResourceAgentControllerGenerateLearningDocumentUrl(),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...options?.headers },
+      body: JSON.stringify(generateLearningDocumentDto),
+    },
+  )
+}
+
+export type resourceAgentControllerListMyResourcesResponse200 = {
+  data: void
+  status: 200
+}
+
+export type resourceAgentControllerListMyResourcesResponseSuccess =
+  resourceAgentControllerListMyResourcesResponse200 & {
+    headers: Headers
+  }
+
+export type resourceAgentControllerListMyResourcesResponse =
+  resourceAgentControllerListMyResourcesResponseSuccess
+
+export const getResourceAgentControllerListMyResourcesUrl = () => {
+  return `/api/resource-agent/resources`
+}
+
+/**
+ * @summary 查询当前用户生成资源列表
+ */
+export const resourceAgentControllerListMyResources = async (
+  options?: RequestInit,
+): Promise<resourceAgentControllerListMyResourcesResponse> => {
+  return request<resourceAgentControllerListMyResourcesResponse>(
+    getResourceAgentControllerListMyResourcesUrl(),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
+}
+
+export type resourceAgentControllerGetMyResourceResponse200 = {
+  data: void
+  status: 200
+}
+
+export type resourceAgentControllerGetMyResourceResponseSuccess =
+  resourceAgentControllerGetMyResourceResponse200 & {
+    headers: Headers
+  }
+
+export type resourceAgentControllerGetMyResourceResponse =
+  resourceAgentControllerGetMyResourceResponseSuccess
+
+export const getResourceAgentControllerGetMyResourceUrl = (id: string) => {
+  return `/api/resource-agent/resources/${id}`
+}
+
+/**
+ * @summary 查看生成资源详情
+ */
+export const resourceAgentControllerGetMyResource = async (
+  id: string,
+  options?: RequestInit,
+): Promise<resourceAgentControllerGetMyResourceResponse> => {
+  return request<resourceAgentControllerGetMyResourceResponse>(
+    getResourceAgentControllerGetMyResourceUrl(id),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
+}
+
+export type resourceAgentControllerDeleteResourceResponse200 = {
+  data: void
+  status: 200
+}
+
+export type resourceAgentControllerDeleteResourceResponseSuccess =
+  resourceAgentControllerDeleteResourceResponse200 & {
+    headers: Headers
+  }
+
+export type resourceAgentControllerDeleteResourceResponse =
+  resourceAgentControllerDeleteResourceResponseSuccess
+
+export const getResourceAgentControllerDeleteResourceUrl = (id: string) => {
+  return `/api/resource-agent/resources/${id}`
+}
+
+/**
+ * @summary 删除生成资源
+ */
+export const resourceAgentControllerDeleteResource = async (
+  id: string,
+  options?: RequestInit,
+): Promise<resourceAgentControllerDeleteResourceResponse> => {
+  return request<resourceAgentControllerDeleteResourceResponse>(
+    getResourceAgentControllerDeleteResourceUrl(id),
+    {
+      ...options,
+      method: 'DELETE',
+    },
+  )
+}
+
+export type resourceAgentControllerDownloadResourceResponse200 = {
+  data: void
+  status: 200
+}
+
+export type resourceAgentControllerDownloadResourceResponseSuccess =
+  resourceAgentControllerDownloadResourceResponse200 & {
+    headers: Headers
+  }
+
+export type resourceAgentControllerDownloadResourceResponse =
+  resourceAgentControllerDownloadResourceResponseSuccess
+
+export const getResourceAgentControllerDownloadResourceUrl = (id: string) => {
+  return `/api/resource-agent/resources/${id}/download`
+}
+
+/**
+ * @summary 下载生成的 docx 文档
+ */
+export const resourceAgentControllerDownloadResource = async (
+  id: string,
+  options?: RequestInit,
+): Promise<resourceAgentControllerDownloadResourceResponse> => {
+  return request<resourceAgentControllerDownloadResourceResponse>(
+    getResourceAgentControllerDownloadResourceUrl(id),
+    {
+      ...options,
+      method: 'GET',
+    },
+  )
 }
