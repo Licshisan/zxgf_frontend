@@ -8,6 +8,7 @@ import {
   DashboardIcon,
   HelpCircleIcon,
   MenuFoldIcon,
+  MenuUnfoldIcon,
   NotificationIcon,
   RobotIcon,
   SettingIcon,
@@ -26,7 +27,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const themeMode = ref<ThemeMode>('light')
-const mobileMenuVisible = ref(false)
+const routeMenuCollapsed = ref(false)
 
 const activeMenu = computed(() => String(route.name || 'chat'))
 const isDark = computed(() => themeMode.value === 'dark')
@@ -61,7 +62,6 @@ function applyTheme(mode: ThemeMode) {
 
 function handleMenuChange(value: string | number) {
   router.push({ name: String(value) })
-  mobileMenuVisible.value = false
 }
 
 function handleLogout() {
@@ -127,6 +127,7 @@ watch(themeMode, applyTheme)
 <template>
   <t-layout class="h-screen overflow-hidden">
     <t-aside
+      v-show="!routeMenuCollapsed"
       width="240px"
       class="hidden h-screen shrink-0 flex-col gap-4 overflow-hidden border-r pt-5 md:flex"
       :class="isDark ? 'border-gray-800 bg-[#15171a]' : 'border-gray-200 bg-white'"
@@ -168,14 +169,19 @@ watch(themeMode, applyTheme)
         :class="isDark ? 'border-gray-800 bg-[#15171a]' : 'border-gray-200 bg-white'"
       >
         <div class="flex min-w-0 items-center gap-2">
-          <t-button
-            variant="text"
-            shape="square"
-            class="mobile-menu-button"
-            @click="mobileMenuVisible = true"
-          >
-            <template #icon><MenuFoldIcon /></template>
-          </t-button>
+          <t-tooltip :content="routeMenuCollapsed ? '显示路由菜单' : '隐藏路由菜单'">
+            <t-button
+              variant="text"
+              shape="square"
+              class="route-menu-toggle"
+              @click="routeMenuCollapsed = !routeMenuCollapsed"
+            >
+              <template #icon>
+                <MenuUnfoldIcon v-if="routeMenuCollapsed" />
+                <MenuFoldIcon v-else />
+              </template>
+            </t-button>
+          </t-tooltip>
 
           <t-breadcrumb class="min-w-0">
             <t-breadcrumb-item class="font-semibold !text-blue-600">智学工坊</t-breadcrumb-item>
@@ -213,57 +219,6 @@ watch(themeMode, applyTheme)
         </t-space>
       </t-header>
 
-      <t-drawer
-        v-model:visible="mobileMenuVisible"
-        placement="left"
-        :footer="false"
-        size="280px"
-        :header="false"
-      >
-        <div
-          class="flex h-full flex-col gap-4 pt-1"
-          :class="isDark ? 'bg-[#15171a] text-gray-100' : 'bg-white text-gray-900'"
-        >
-          <div class="flex items-center gap-3 px-1 pb-3">
-            <img :src="logoUrl" alt="智学工坊" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
-            <div class="min-w-0">
-              <h2 class="m-0 text-lg font-semibold text-blue-600">智学工坊</h2>
-              <p class="m-0 text-xs" :class="isDark ? 'text-gray-400' : 'text-gray-500'">
-                AI 学习智能体
-              </p>
-            </div>
-          </div>
-
-          <t-menu
-            :value="activeMenu"
-            :theme="themeMode"
-            class="border-r-0"
-            @change="handleMenuChange"
-          >
-            <t-menu-item v-for="item in navItems" :key="item.value" :value="item.value">
-              <template #icon><component :is="item.icon" /></template>
-              {{ item.label }}
-            </t-menu-item>
-          </t-menu>
-
-          <div
-            class="mt-auto border-t pt-2"
-            :class="isDark ? 'border-gray-800' : 'border-gray-200'"
-          >
-            <t-menu :value="activeMenu" :theme="themeMode" @change="handleMenuChange">
-              <t-menu-item value="settings">
-                <template #icon><SettingIcon /></template>
-                系统设置
-              </t-menu-item>
-              <t-menu-item value="help">
-                <template #icon><HelpCircleIcon /></template>
-                帮助中心
-              </t-menu-item>
-            </t-menu>
-          </div>
-        </div>
-      </t-drawer>
-
       <t-content
         class="app-scrollbar min-w-0 flex-1 overflow-y-auto"
         :class="isDark ? 'bg-[#101214]' : 'bg-white'"
@@ -284,13 +239,13 @@ watch(themeMode, applyTheme)
   border-right-color: #2563eb;
 }
 
-.mobile-menu-button {
-  display: inline-flex;
+.route-menu-toggle {
+  display: none;
 }
 
 @media (min-width: 768px) {
-  .mobile-menu-button {
-    display: none !important;
+  .route-menu-toggle {
+    display: inline-flex;
   }
 }
 

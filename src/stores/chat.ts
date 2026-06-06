@@ -2,21 +2,44 @@ import { defineStore } from 'pinia'
 import type { ChatMessagesData } from '@tdesign-vue-next/chat'
 import { MessagePlugin } from 'tdesign-vue-next'
 
-import { sessionControllerCreateSession, sessionControllerGetMySession } from '@/api/generated'
+import {
+  sessionControllerCreateSession,
+  sessionControllerDeleteSession,
+  sessionControllerGetMySession,
+  sessionControllerListMySessions,
+  sessionControllerUpdateSession,
+} from '@/api/generated'
 import type { AuthUser } from '@/stores/auth'
 
 type ChatRole = 'user' | 'assistant'
 
-interface SessionMessage {
+export interface SessionMessage {
   id: string
   role: ChatRole | string
   content: string
   createdAt?: string
 }
 
-interface SessionRecord {
+export interface SessionSummary {
   id: string
+  title?: string | null
+  course?: string | null
+  goal?: string | null
+  metadata?: Record<string, unknown> | null
+  createdAt?: string
+  updatedAt?: string
+  latestMessage?: SessionMessage | null
+}
+
+interface SessionRecord extends SessionSummary {
   messages?: SessionMessage[]
+}
+
+interface SessionListPayload {
+  items?: SessionSummary[]
+  page?: number
+  pageSize?: number
+  total?: number
 }
 
 interface ApiResponse<T> {
@@ -36,11 +59,12 @@ function getUserSessionId(user: AuthUser | null) {
 }
 
 function toChatMessage(message: SessionMessage): ChatMessagesData | null {
-  if (message.role !== 'user' && message.role !== 'assistant') return null
+  const role = String(message.role).toLowerCase()
+  if (role !== 'user' && role !== 'assistant') return null
 
   return {
     id: message.id,
-    role: message.role,
+    role,
     datetime: message.createdAt,
     content: [
       {
@@ -50,6 +74,15 @@ function toChatMessage(message: SessionMessage): ChatMessagesData | null {
       },
     ],
   } as ChatMessagesData
+}
+
+function upsertSession(sessions: SessionSummary[], session: SessionSummary) {
+  const index = sessions.findIndex((item) => item.id === session.id)
+  if (index === -1) return [session, ...sessions]
+
+  const nextSessions = [...sessions]
+  nextSessions[index] = { ...nextSessions[index], ...session }
+  return nextSessions
 }
 
 export const chatWelcomeMessage: ChatMessagesData = {
@@ -87,51 +120,154 @@ export const useChatStore = defineStore('chat', {
     userId: '',
     sessionId: '',
     initialized: false,
+    draftSession: false,
+    loadingSessions: false,
     loadingHistory: false,
+    creatingSession: false,
+    updatingSession: false,
+    deletingSession: false,
+    sessions: [] as SessionSummary[],
     messages: [chatWelcomeMessage] as ChatMessagesData[],
   }),
+  getters: {
+    activeSession: (state) => state.sessions.find((session) => session.id === state.sessionId),
+  },
   actions: {
-    async ensureSession(user: AuthUser | null) {
+    async initialize(user: AuthUser | null, preferredSessionId?: string) {
       const defaultSessionId = getUserSessionId(user)
       if (!defaultSessionId) throw new Error('无法获取当前用户 ID')
 
-      if (this.initialized && this.userId === defaultSessionId && this.sessionId) {
+      const userChanged = this.userId !== defaultSessionId
+      this.userId = defaultSessionId
+
+      if (userChanged) {
+        this.sessionId = ''
+        this.initialized = false
+        this.messages = [chatWelcomeMessage]
+      }
+
+      await this.loadSessions()
+
+      const targetSessionId = preferredSessionId || this.sessionId || this.sessions[0]?.id
+
+      if (!targetSessionId) {
+        this.beginDraftSession()
+        this.initialized = true
         return this.sessionId
       }
 
-      this.userId = defaultSessionId
-      this.sessionId = defaultSessionId
-      this.loadingHistory = true
-
+      await this.openSession(targetSessionId)
+      this.initialized = true
+      return this.sessionId
+    },
+    async ensureSession(user: AuthUser | null) {
+      if (this.sessionId && this.initialized && !this.draftSession) return this.sessionId
+      return this.initialize(user)
+    },
+    async loadSessions() {
+      this.loadingSessions = true
       try {
-        const session = await this.loadSession(defaultSessionId)
-        this.sessionId = session.id
-        this.replaceHistory(session.messages ?? [])
-      } catch (error) {
-        if (!isNotFoundError(error)) throw error
-
+        const response = await sessionControllerListMySessions()
+        const payload = readResponseData<SessionListPayload>(response)
+        this.sessions = payload?.items ?? []
+      } finally {
+        this.loadingSessions = false
+      }
+    },
+    async createSession(options: { switchTo?: boolean; title?: string } = {}) {
+      this.creatingSession = true
+      try {
+        const title = options.title?.trim()
         const created = readResponseData<SessionRecord>(
           await sessionControllerCreateSession({
-            title: '默认会话',
-            metadata: { source: 'chat-default', defaultUserSessionId: defaultSessionId },
+            ...(title ? { title } : {}),
+            metadata: { source: 'chat-manual' },
           }),
         )
-        if (!created?.id) throw new Error('创建默认会话失败')
+        if (!created?.id) throw new Error('创建会话失败')
 
-        this.sessionId = created.id
-        this.messages = [chatWelcomeMessage]
+        this.sessions = upsertSession(this.sessions, created)
+        if (options.switchTo !== false) {
+          this.sessionId = created.id
+          this.draftSession = false
+          this.messages = [chatWelcomeMessage]
+        }
+        return created.id
       } finally {
-        this.initialized = true
+        this.creatingSession = false
+      }
+    },
+    setSessionTitle(sessionId: string, title: string) {
+      const nextTitle = title.replace(/\s+/g, ' ').trim()
+      if (!nextTitle) return
+      const normalizedTitle = nextTitle.length > 30 ? `${nextTitle.slice(0, 30)}...` : nextTitle
+      this.sessions = upsertSession(this.sessions, { id: sessionId, title: normalizedTitle })
+    },
+    beginDraftSession() {
+      this.sessionId = ''
+      this.draftSession = true
+      this.messages = [chatWelcomeMessage]
+    },
+    async openSession(sessionId: string) {
+      if (!sessionId) throw new Error('会话 ID 为空')
+
+      this.loadingHistory = true
+      try {
+        const session = await this.loadSession(sessionId)
+        this.sessionId = session.id
+        this.draftSession = false
+        this.sessions = upsertSession(this.sessions, session)
+        this.replaceHistory(session.messages ?? [])
+        return session.id
+      } catch (error) {
+        if (isNotFoundError(error)) {
+          this.sessions = this.sessions.filter((session) => session.id !== sessionId)
+          throw new Error('会话不存在或无权访问')
+        }
+        throw error
+      } finally {
         this.loadingHistory = false
       }
-
-      return this.sessionId
     },
     async loadSession(sessionId: string) {
       const response = await sessionControllerGetMySession(sessionId)
       const session = readResponseData<SessionRecord>(response)
       if (!session?.id) throw new Error('会话数据为空')
       return session
+    },
+    async renameSession(sessionId: string, title: string) {
+      const nextTitle = title.trim()
+      if (!nextTitle) throw new Error('会话标题不能为空')
+
+      this.updatingSession = true
+      try {
+        const updated = readResponseData<SessionRecord>(
+          await sessionControllerUpdateSession(sessionId, { title: nextTitle }),
+        )
+        this.sessions = upsertSession(this.sessions, updated?.id ? updated : { id: sessionId, title: nextTitle })
+      } finally {
+        this.updatingSession = false
+      }
+    },
+    async deleteSession(sessionId: string) {
+      this.deletingSession = true
+      try {
+        await sessionControllerDeleteSession(sessionId)
+        this.sessions = this.sessions.filter((session) => session.id !== sessionId)
+
+        if (this.sessionId !== sessionId) return this.sessionId
+
+        const nextSessionId = this.sessions[0]?.id
+        if (nextSessionId) {
+          await this.openSession(nextSessionId)
+          return nextSessionId
+        }
+
+        const createdId = await this.createSession({ switchTo: true })
+        return createdId
+      } finally {
+        this.deletingSession = false
+      }
     },
     replaceHistory(history: SessionMessage[]) {
       const historyMessages = history.map(toChatMessage).filter(Boolean) as ChatMessagesData[]
@@ -144,7 +280,13 @@ export const useChatStore = defineStore('chat', {
       this.userId = ''
       this.sessionId = ''
       this.initialized = false
+      this.draftSession = false
+      this.loadingSessions = false
       this.loadingHistory = false
+      this.creatingSession = false
+      this.updatingSession = false
+      this.deletingSession = false
+      this.sessions = []
       this.messages = [chatWelcomeMessage]
     },
     showHistoryError(error: unknown) {
