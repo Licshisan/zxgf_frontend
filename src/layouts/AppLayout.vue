@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { MessagePlugin } from 'tdesign-vue-next'
 import {
@@ -72,10 +72,12 @@ function handleMenuChange(value: string | number) {
 function handleTopMenuClick(value: string | number) {
   if (value === 'new-chat') {
     void handleCreateSession()
+    syncMobileSidebar()
     return
   }
 
   router.push({ name: String(value) })
+  syncMobileSidebar()
 }
 
 async function handleCreateSession() {
@@ -89,6 +91,7 @@ async function handleOpenSession(sessionId: string) {
     name: 'chat',
     query: { sessionId },
   })
+  syncMobileSidebar()
 }
 
 function openRenameDialog(session: SessionSummary) {
@@ -183,15 +186,40 @@ function toggleTheme(event: MouseEvent) {
   })
 }
 
+function syncMobileSidebar() {
+  if (window.innerWidth < 768) {
+    routeMenuCollapsed.value = true
+  }
+}
+
+function closeMobileSidebar() {
+  if (window.innerWidth < 768) {
+    routeMenuCollapsed.value = true
+  }
+}
+
 onMounted(() => {
   const savedTheme = localStorage.getItem('theme-mode')
   themeMode.value = savedTheme === 'dark' ? 'dark' : 'light'
   applyTheme(themeMode.value)
 
+  syncMobileSidebar()
+  window.addEventListener('resize', syncMobileSidebar)
   loadSidebarSessions()
 })
 
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', syncMobileSidebar)
+})
+
 watch(themeMode, applyTheme)
+
+watch(
+  () => route.fullPath,
+  () => {
+    syncMobileSidebar()
+  },
+)
 
 watch(
   () => auth.user?.id,
@@ -214,8 +242,8 @@ function sessionTitle(session?: SessionSummary | null) {
   <t-layout class="h-screen overflow-hidden">
     <t-aside
       v-show="!routeMenuCollapsed"
-      width="240px"
-      class="hidden h-screen shrink-0 flex-col overflow-hidden border-r md:flex"
+      width="260px"
+      class="fixed inset-y-0 left-0 z-40 flex h-screen shrink-0 flex-col overflow-hidden border-r shadow-xl md:static md:z-auto md:shadow-none"
       :class="isDark ? 'border-gray-800 bg-[#15171a]' : 'border-gray-200 bg-white'"
     >
       <div class="flex shrink-0 items-center gap-3 px-4 pb-3 pt-4">
@@ -270,6 +298,12 @@ function sessionTitle(session?: SessionSummary | null) {
         </t-menu>
       </div>
     </t-aside>
+
+    <div
+      v-if="!routeMenuCollapsed"
+      class="fixed inset-0 z-30 bg-black/30 md:hidden"
+      @click="closeMobileSidebar"
+    />
 
     <t-layout class="h-screen min-w-0 overflow-hidden">
       <t-header
@@ -389,13 +423,7 @@ function sessionTitle(session?: SessionSummary | null) {
 }
 
 .route-menu-toggle {
-  display: none;
-}
-
-@media (min-width: 768px) {
-  .route-menu-toggle {
-    display: inline-flex;
-  }
+  display: inline-flex;
 }
 
 :global(::view-transition-old(root)),

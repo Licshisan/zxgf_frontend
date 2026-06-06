@@ -2,7 +2,7 @@
   <div class="flex h-full min-h-0 overflow-hidden bg-[#f7f9fc] dark:bg-[#101214]">
     <section class="flex min-h-0 min-w-0 flex-1 flex-col bg-white dark:bg-[#101214]">
       <t-chat-list ref="listRef" class="chat-list min-h-0 flex-1" :clear-history="false">
-        <div class="mx-auto w-full max-w-[860px] pt-5">
+        <div class="mx-auto w-full max-w-[860px] px-1 pt-5 sm:px-2 lg:px-3">
           <div v-if="chatStore.loadingHistory" class="px-4 py-6">
             <t-chat-loading animation="skeleton" />
           </div>
@@ -20,7 +20,11 @@
             }"
           >
             <template v-for="(item, index) in message.content" :key="`toolcall-${message.id}-${index}`">
-              <div v-if="isToolCallSegment(item)" :slot="`${item.type}-${index}`" class="chat-tool-call">
+              <div
+                v-if="isToolCallSegment(item) && !hasReadableText(message)"
+                v-bind="toolCallSlotAttrs(item, index)"
+                class="chat-tool-call"
+              >
                 <div class="flex items-center gap-2">
                   <t-loading v-if="item.status !== 'complete'" size="small" />
                   <span class="font-medium">{{ toolCallStatusText(item) }}</span>
@@ -34,7 +38,7 @@
         </div>
       </t-chat-list>
 
-      <div class="w-full shrink-0 bg-white px-3 pb-4 pt-0 dark:bg-[#101214]">
+      <div class="w-full shrink-0 bg-white px-1 pb-4 pt-0 dark:bg-[#101214] sm:px-2 lg:px-3">
         <div class="mx-auto w-full max-w-[900px]">
           <t-chat-sender
             v-model="inputValue"
@@ -202,10 +206,25 @@ async function openSessionAndSyncRoute(sessionId: string, updateRoute: boolean) 
 }
 
 function isToolCallSegment(content: unknown): content is ChatContentSegment & {
-  type: 'toolcall'
+  type: string
   data: Record<string, unknown>
 } {
-  return !!content && typeof content === 'object' && (content as { type?: string }).type === 'toolcall'
+  return (
+    !!content &&
+    typeof content === 'object' &&
+    typeof (content as { type?: string }).type === 'string' &&
+    (content as { type: string }).type.startsWith('toolcall')
+  )
+}
+
+function hasReadableText(message: ChatMessagesData) {
+  return Boolean(extractText(message))
+}
+
+function toolCallSlotAttrs(content: ChatContentSegment, index: number) {
+  return {
+    slot: `${content.type}-${index}`,
+  }
 }
 
 function toolCallStatusText(content: ChatContentSegment) {
