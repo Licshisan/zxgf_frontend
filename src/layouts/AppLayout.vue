@@ -1,58 +1,63 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { MessagePlugin } from 'tdesign-vue-next'
 import {
-  AppIcon,
   ChartAnalyticsIcon,
   ChatBubbleLockedIcon,
-  DashboardIcon,
-  HelpCircleIcon,
   MenuFoldIcon,
   MenuUnfoldIcon,
-  NotificationIcon,
   RobotIcon,
   SettingIcon,
   TaskCheckedIcon,
   UserCircleIcon,
-  FolderIcon,
   SunnyIcon,
   MoonIcon,
 } from 'tdesign-icons-vue-next'
 import logoUrl from '@/assets/logo.webp'
+import ChatSessionList from '@/components/ChatSessionList.vue'
 import { useAuthStore } from '@/stores/auth'
+import { type SessionSummary, useChatStore } from '@/stores/chat'
 
 type ThemeMode = 'light' | 'dark'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
+const chatStore = useChatStore()
 const themeMode = ref<ThemeMode>('light')
 const routeMenuCollapsed = ref(false)
+const renameDialogVisible = ref(false)
+const deleteDialogVisible = ref(false)
+const renameTitle = ref('')
+const operatingSessionId = ref('')
 
 const activeMenu = computed(() => String(route.name || 'chat'))
 const isDark = computed(() => themeMode.value === 'dark')
 
-const navItems = [
-  { value: 'chat', label: 'AI 问答', icon: ChatBubbleLockedIcon },
-  { value: 'dashboard', label: '仪表盘', icon: DashboardIcon },
-  { value: 'profile', label: '学习画像', icon: ChartAnalyticsIcon },
-  { value: 'resources', label: '资源生成', icon: RobotIcon },
+const topMenuItems = [
+  { value: 'new-chat', label: '新建对话', icon: ChatBubbleLockedIcon },
+  { value: 'resources', label: '我的资源', icon: RobotIcon },
   { value: 'evaluate', label: '测评中心', icon: TaskCheckedIcon },
-  { value: 'knowledge', label: '知识库', icon: FolderIcon },
+  { value: 'profile', label: '学习画像', icon: ChartAnalyticsIcon },
 ]
 
 const pageTitles: Record<string, string> = {
-  dashboard: '仪表盘',
   profile: '学习画像',
-  resources: '资源生成',
-  chat: 'AI 问答',
+  resources: '我的资源',
+  chat: '新会话',
   evaluate: '测评中心',
-  knowledge: '知识库',
   settings: '系统设置',
-  help: '帮助中心',
 }
 
 const pageTitle = computed(() => pageTitles[activeMenu.value] || 'AI 问答')
+const topMenuValue = computed(() => {
+  if (activeMenu.value === 'chat' && !chatStore.sessionId) return 'new-chat'
+  return ['resources', 'evaluate', 'profile'].includes(activeMenu.value) ? activeMenu.value : ''
+})
+const headerTitle = computed(() =>
+  activeMenu.value === 'chat' ? sessionTitle(chatStore.activeSession) : pageTitle.value,
+)
 
 function applyTheme(mode: ThemeMode) {
   document.documentElement.classList.toggle('dark', mode === 'dark')
@@ -62,6 +67,69 @@ function applyTheme(mode: ThemeMode) {
 
 function handleMenuChange(value: string | number) {
   router.push({ name: String(value) })
+}
+
+function handleTopMenuClick(value: string | number) {
+  if (value === 'new-chat') {
+    void handleCreateSession()
+    return
+  }
+
+  router.push({ name: String(value) })
+}
+
+async function handleCreateSession() {
+  chatStore.beginDraftSession()
+  await router.push({ name: 'chat' })
+}
+
+async function handleOpenSession(sessionId: string) {
+  if (!sessionId) return
+  await router.push({
+    name: 'chat',
+    query: { sessionId },
+  })
+}
+
+function openRenameDialog(session: SessionSummary) {
+  operatingSessionId.value = session.id
+  renameTitle.value = sessionTitle(session)
+  renameDialogVisible.value = true
+}
+
+async function handleRenameConfirm() {
+  try {
+    await chatStore.renameSession(operatingSessionId.value, renameTitle.value)
+    renameDialogVisible.value = false
+    MessagePlugin.success('会话已重命名')
+  } catch (error) {
+    MessagePlugin.error(error instanceof Error ? error.message : '重命名失败')
+  }
+}
+
+function openDeleteDialog(session: SessionSummary) {
+  operatingSessionId.value = session.id
+  deleteDialogVisible.value = true
+}
+
+async function handleDeleteConfirm() {
+  try {
+    const sessionId = await chatStore.deleteSession(operatingSessionId.value)
+    deleteDialogVisible.value = false
+    MessagePlugin.success('会话已删除')
+
+    if (sessionId) {
+      await router.push({
+        name: 'chat',
+        query: { sessionId },
+      })
+      return
+    }
+
+    await router.push({ name: 'chat' })
+  } catch (error) {
+    MessagePlugin.error(error instanceof Error ? error.message : '删除会话失败')
+  }
 }
 
 function handleLogout() {
@@ -119,9 +187,27 @@ onMounted(() => {
   const savedTheme = localStorage.getItem('theme-mode')
   themeMode.value = savedTheme === 'dark' ? 'dark' : 'light'
   applyTheme(themeMode.value)
+
+  loadSidebarSessions()
 })
 
 watch(themeMode, applyTheme)
+
+watch(
+  () => auth.user?.id,
+  () => {
+    loadSidebarSessions()
+  },
+)
+
+function loadSidebarSessions() {
+  if (!auth.user || chatStore.loadingSessions) return
+  void chatStore.loadSessions()
+}
+
+function sessionTitle(session?: SessionSummary | null) {
+  return session?.title?.trim() || '新会话'
+}
 </script>
 
 <template>
@@ -129,10 +215,10 @@ watch(themeMode, applyTheme)
     <t-aside
       v-show="!routeMenuCollapsed"
       width="240px"
-      class="hidden h-screen shrink-0 flex-col gap-4 overflow-hidden border-r pt-5 md:flex"
+      class="hidden h-screen shrink-0 flex-col overflow-hidden border-r md:flex"
       :class="isDark ? 'border-gray-800 bg-[#15171a]' : 'border-gray-200 bg-white'"
     >
-      <div class="flex items-center gap-3 px-4">
+      <div class="flex shrink-0 items-center gap-3 px-4 pb-3 pt-4">
         <img :src="logoUrl" alt="智学工坊" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
         <div>
           <h1 class="m-0 text-xl font-semibold text-blue-600">智学工坊</h1>
@@ -142,22 +228,44 @@ watch(themeMode, applyTheme)
         </div>
       </div>
 
-      <t-menu :value="activeMenu" :theme="themeMode" class="border-r-0" @change="handleMenuChange">
-        <t-menu-item v-for="item in navItems" :key="item.value" :value="item.value">
+      <t-menu
+        :value="topMenuValue"
+        :theme="themeMode"
+        class="compact-route-menu shrink-0 border-r-0"
+      >
+        <t-menu-item
+          v-for="item in topMenuItems"
+          :key="item.value"
+          :value="item.value"
+          @click="handleTopMenuClick(item.value)"
+        >
           <template #icon><component :is="item.icon" /></template>
           {{ item.label }}
         </t-menu-item>
       </t-menu>
 
-      <div class="mt-auto border-t pt-2" :class="isDark ? 'border-gray-800' : 'border-gray-200'">
-        <t-menu :value="activeMenu" :theme="themeMode" @change="handleMenuChange">
+      <div class="flex h-0 min-h-[180px] min-w-0 max-w-full flex-1 overflow-hidden pt-1">
+        <ChatSessionList
+          :sessions="chatStore.sessions"
+          :active-session-id="chatStore.sessionId"
+          :loading="chatStore.loadingSessions"
+          :is-dark="isDark"
+          @open="handleOpenSession"
+          @rename="openRenameDialog"
+          @delete="openDeleteDialog"
+        />
+      </div>
+
+      <div class="shrink-0 border-t pb-3 pt-2" :class="isDark ? 'border-gray-800' : 'border-gray-200'">
+        <t-menu
+          :value="activeMenu"
+          :theme="themeMode"
+          class="compact-route-menu shrink-0 border-r-0"
+          @change="handleMenuChange"
+        >
           <t-menu-item value="settings">
             <template #icon><SettingIcon /></template>
             系统设置
-          </t-menu-item>
-          <t-menu-item value="help">
-            <template #icon><HelpCircleIcon /></template>
-            帮助中心
           </t-menu-item>
         </t-menu>
       </div>
@@ -165,7 +273,7 @@ watch(themeMode, applyTheme)
 
     <t-layout class="h-screen min-w-0 overflow-hidden">
       <t-header
-        class="flex h-16 shrink-0 items-center justify-between border-b px-4 md:px-6"
+        class="relative flex h-16 shrink-0 items-center justify-between border-b px-4 md:px-6"
         :class="isDark ? 'border-gray-800 bg-[#15171a]' : 'border-gray-200 bg-white'"
       >
         <div class="flex min-w-0 items-center gap-2">
@@ -182,12 +290,14 @@ watch(themeMode, applyTheme)
               </template>
             </t-button>
           </t-tooltip>
-
-          <t-breadcrumb class="min-w-0">
-            <t-breadcrumb-item class="font-semibold !text-blue-600">智学工坊</t-breadcrumb-item>
-            <t-breadcrumb-item>{{ pageTitle }}</t-breadcrumb-item>
-          </t-breadcrumb>
         </div>
+
+        <h2
+          class="pointer-events-none absolute left-1/2 m-0 max-w-[48vw] -translate-x-1/2 truncate text-base font-semibold"
+          :class="isDark ? 'text-gray-100' : 'text-gray-900'"
+        >
+          {{ headerTitle }}
+        </h2>
 
         <t-space align="center">
           <t-tooltip :content="isDark ? '切换浅色主题' : '切换暗黑主题'">
@@ -198,12 +308,6 @@ watch(themeMode, applyTheme)
               </template>
             </t-button>
           </t-tooltip>
-          <t-button variant="text" shape="square">
-            <template #icon><NotificationIcon /></template>
-          </t-button>
-          <t-button variant="text" shape="square">
-            <template #icon><AppIcon /></template>
-          </t-button>
           <t-dropdown>
             <t-avatar shape="round">{{ auth.user?.name?.slice(0, 1) || 'U' }}</t-avatar>
             <template #dropdown>
@@ -226,17 +330,62 @@ watch(themeMode, applyTheme)
         <router-view />
       </t-content>
     </t-layout>
+
+    <t-dialog
+      v-model:visible="renameDialogVisible"
+      header="重命名会话"
+      confirm-btn="保存"
+      cancel-btn="取消"
+      :confirm-loading="chatStore.updatingSession"
+      @confirm="handleRenameConfirm"
+    >
+      <t-input
+        v-model="renameTitle"
+        placeholder="请输入会话标题"
+        clearable
+        @enter="handleRenameConfirm"
+      />
+    </t-dialog>
+
+    <t-dialog
+      v-model:visible="deleteDialogVisible"
+      header="删除会话"
+      confirm-btn="删除"
+      cancel-btn="取消"
+      theme="warning"
+      :confirm-loading="chatStore.deletingSession"
+      @confirm="handleDeleteConfirm"
+    >
+      删除后该会话和历史消息将不可恢复。
+    </t-dialog>
   </t-layout>
 </template>
 
 <style scoped>
 :deep(.t-menu__item) {
-  margin-bottom: 12px;
+  margin-bottom: 2px;
   border-right: 3px solid transparent;
 }
 
+:deep(.compact-route-menu .t-menu__item) {
+  height: 32px;
+  margin: 0 6px;
+  border-radius: 6px;
+  border-right: 0;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  font-size: 14px;
+}
+
+:deep(.compact-route-menu) {
+  height: auto !important;
+  flex: 0 0 auto;
+  padding: 0 !important;
+}
+
 :deep(.t-menu__item.t-is-active) {
-  border-right-color: #2563eb;
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.08);
 }
 
 .route-menu-toggle {

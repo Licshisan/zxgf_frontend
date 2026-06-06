@@ -119,6 +119,7 @@ export const useChatStore = defineStore('chat', {
   state: () => ({
     userId: '',
     sessionId: '',
+    draftVersion: 0,
     initialized: false,
     draftSession: false,
     loadingSessions: false,
@@ -164,14 +165,14 @@ export const useChatStore = defineStore('chat', {
       if (this.sessionId && this.initialized && !this.draftSession) return this.sessionId
       return this.initialize(user)
     },
-    async loadSessions() {
-      this.loadingSessions = true
+    async loadSessions(options: { silent?: boolean } = {}) {
+      if (!options.silent) this.loadingSessions = true
       try {
         const response = await sessionControllerListMySessions()
         const payload = readResponseData<SessionListPayload>(response)
         this.sessions = payload?.items ?? []
       } finally {
-        this.loadingSessions = false
+        if (!options.silent) this.loadingSessions = false
       }
     },
     async createSession(options: { switchTo?: boolean; title?: string } = {}) {
@@ -206,6 +207,7 @@ export const useChatStore = defineStore('chat', {
     beginDraftSession() {
       this.sessionId = ''
       this.draftSession = true
+      this.draftVersion += 1
       this.messages = [chatWelcomeMessage]
     },
     async openSession(sessionId: string) {
@@ -279,6 +281,7 @@ export const useChatStore = defineStore('chat', {
     reset() {
       this.userId = ''
       this.sessionId = ''
+      this.draftVersion = 0
       this.initialized = false
       this.draftSession = false
       this.loadingSessions = false

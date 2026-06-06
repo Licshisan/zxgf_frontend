@@ -1,42 +1,8 @@
 <template>
-  <div
-    class="grid h-full min-h-0 grid-cols-1 overflow-hidden bg-[#f7f9fc] md:grid-cols-[240px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)]"
-  >
-    <ChatSessionList
-      :sessions="chatStore.sessions"
-      :active-session-id="chatStore.sessionId"
-      :loading="chatStore.loadingSessions"
-      :creating-session="chatStore.creatingSession"
-      @create="handleCreateSession"
-      @open="handleOpenSession"
-      @rename="openRenameDialog"
-      @delete="openDeleteDialog"
-    />
-
-    <section class="flex min-h-0 min-w-0 flex-col bg-white">
-      <header class="flex h-14 shrink-0 items-center gap-3 border-b border-gray-200 px-3 lg:px-5">
-        <div class="min-w-0 flex-1">
-          <h2 class="m-0 truncate text-base font-semibold text-gray-900">
-            {{ sessionTitle(chatStore.activeSession) }}
-          </h2>
-          <p class="m-0 mt-0.5 text-xs text-gray-500">
-            {{ chatStore.sessionId ? '会话已同步' : '准备会话中' }}
-          </p>
-        </div>
-
-        <t-button
-          theme="primary"
-          variant="outline"
-          :loading="chatStore.creatingSession"
-          @click="handleCreateSession"
-        >
-          <template #icon><AddIcon /></template>
-          新会话
-        </t-button>
-      </header>
-
+  <div class="flex h-full min-h-0 overflow-hidden bg-[#f7f9fc] dark:bg-[#101214]">
+    <section class="flex min-h-0 min-w-0 flex-1 flex-col bg-white dark:bg-[#101214]">
       <t-chat-list ref="listRef" class="chat-list min-h-0 flex-1" :clear-history="false">
-        <div class="mx-auto w-full max-w-[860px] pt-4">
+        <div class="mx-auto w-full max-w-[860px] pt-5">
           <div v-if="chatStore.loadingHistory" class="px-4 py-6">
             <t-chat-loading animation="skeleton" />
           </div>
@@ -59,7 +25,7 @@
                   <t-loading v-if="item.status !== 'complete'" size="small" />
                   <span class="font-medium">{{ toolCallStatusText(item) }}</span>
                 </div>
-                <div class="mt-1 text-xs text-gray-500">
+                <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {{ toolCallDetailText(item) }}
                 </div>
               </div>
@@ -68,7 +34,7 @@
         </div>
       </t-chat-list>
 
-      <div class="w-full shrink-0 bg-white px-3 pb-4 pt-0">
+      <div class="w-full shrink-0 bg-white px-3 pb-4 pt-0 dark:bg-[#101214]">
         <div class="mx-auto w-full max-w-[900px]">
           <t-chat-sender
             v-model="inputValue"
@@ -81,34 +47,6 @@
         </div>
       </div>
     </section>
-
-    <t-dialog
-      v-model:visible="renameDialogVisible"
-      header="重命名会话"
-      confirm-btn="保存"
-      cancel-btn="取消"
-      :confirm-loading="chatStore.updatingSession"
-      @confirm="handleRenameConfirm"
-    >
-      <t-input
-        v-model="renameTitle"
-        placeholder="请输入会话标题"
-        clearable
-        @enter="handleRenameConfirm"
-      />
-    </t-dialog>
-
-    <t-dialog
-      v-model:visible="deleteDialogVisible"
-      header="删除会话"
-      confirm-btn="删除"
-      cancel-btn="取消"
-      theme="warning"
-      :confirm-loading="chatStore.deletingSession"
-      @confirm="handleDeleteConfirm"
-    >
-      删除后该会话和历史消息将不可恢复。
-    </t-dialog>
   </div>
 </template>
 
@@ -123,11 +61,9 @@ import {
   useChat,
 } from '@tdesign-vue-next/chat'
 import { MessagePlugin } from 'tdesign-vue-next'
-import { AddIcon } from 'tdesign-icons-vue-next'
 
-import ChatSessionList from '@/components/ChatSessionList.vue'
 import { useAuthStore } from '@/stores/auth'
-import { chatWelcomeMessage, type SessionSummary, useChatStore } from '@/stores/chat'
+import { chatWelcomeMessage, useChatStore } from '@/stores/chat'
 
 interface AguiMessage {
   id?: string
@@ -153,10 +89,6 @@ const inputValue = ref('')
 const listRef = ref<TdChatListApi | null>(null)
 const auth = useAuthStore()
 const chatStore = useChatStore()
-const renameDialogVisible = ref(false)
-const deleteDialogVisible = ref(false)
-const renameTitle = ref('')
-const operatingSessionId = ref('')
 
 const isChatBusy = computed(
   () => chatStore.loadingHistory || status.value === 'pending' || status.value === 'streaming',
@@ -191,8 +123,41 @@ watch(
   () => route.query.sessionId,
   async (sessionId) => {
     const nextSessionId = typeof sessionId === 'string' ? sessionId : ''
-    if (!nextSessionId || nextSessionId === chatStore.sessionId) return
+    if (!nextSessionId) {
+      if (chatStore.sessionId || !chatStore.draftSession) {
+        chatStore.beginDraftSession()
+        chatEngine.value?.setMessages(chatStore.messages)
+        await scrollToBottom()
+      }
+      return
+    }
+
+    if (nextSessionId === chatStore.sessionId) return
     await openSessionAndSyncRoute(nextSessionId, false)
+  },
+)
+
+watch(
+  () => chatStore.sessionId,
+  async (sessionId) => {
+    if (sessionId) {
+      if (route.query.sessionId !== sessionId) await syncRouteSession(sessionId)
+      chatEngine.value?.setMessages(chatStore.messages)
+    } else {
+      await clearRouteSession()
+      chatEngine.value?.setMessages(chatStore.messages)
+    }
+    await scrollToBottom()
+  },
+)
+
+watch(
+  () => chatStore.draftVersion,
+  async () => {
+    if (chatStore.sessionId) return
+    await clearRouteSession()
+    chatEngine.value?.setMessages(chatStore.messages)
+    await scrollToBottom()
   },
 )
 
@@ -207,6 +172,14 @@ watch(
 async function initializeFromRoute() {
   try {
     const routeSessionId = typeof route.query.sessionId === 'string' ? route.query.sessionId : undefined
+
+    if (!routeSessionId && chatStore.draftSession) {
+      chatEngine.value?.setMessages(chatStore.messages)
+      await clearRouteSession()
+      await scrollToBottom()
+      return
+    }
+
     const sessionId = await chatStore.initialize(auth.user, routeSessionId)
     chatEngine.value?.setMessages(chatStore.messages)
     await syncRouteSession(sessionId)
@@ -214,17 +187,6 @@ async function initializeFromRoute() {
   } catch (error) {
     chatStore.showHistoryError(error)
   }
-}
-
-async function handleCreateSession() {
-  chatStore.beginDraftSession()
-  chatEngine.value?.setMessages(chatStore.messages)
-  await clearRouteSession()
-  await scrollToBottom()
-}
-
-async function handleOpenSession(sessionId: string) {
-  await openSessionAndSyncRoute(sessionId, true)
 }
 
 async function openSessionAndSyncRoute(sessionId: string, updateRoute: boolean) {
@@ -236,39 +198,6 @@ async function openSessionAndSyncRoute(sessionId: string, updateRoute: boolean) 
   } catch (error) {
     MessagePlugin.error(error instanceof Error ? error.message : '打开会话失败')
     if (updateRoute) await initializeFromRoute()
-  }
-}
-
-function openRenameDialog(session: SessionSummary) {
-  operatingSessionId.value = session.id
-  renameTitle.value = sessionTitle(session)
-  renameDialogVisible.value = true
-}
-
-async function handleRenameConfirm() {
-  try {
-    await chatStore.renameSession(operatingSessionId.value, renameTitle.value)
-    renameDialogVisible.value = false
-    MessagePlugin.success('会话已重命名')
-  } catch (error) {
-    MessagePlugin.error(error instanceof Error ? error.message : '重命名失败')
-  }
-}
-
-function openDeleteDialog(session: SessionSummary) {
-  operatingSessionId.value = session.id
-  deleteDialogVisible.value = true
-}
-
-async function handleDeleteConfirm() {
-  try {
-    const sessionId = await chatStore.deleteSession(operatingSessionId.value)
-    chatEngine.value?.setMessages(chatStore.messages)
-    await syncRouteSession(sessionId)
-    deleteDialogVisible.value = false
-    MessagePlugin.success('会话已删除')
-  } catch (error) {
-    MessagePlugin.error(error instanceof Error ? error.message : '删除会话失败')
   }
 }
 
@@ -409,7 +338,7 @@ async function handleSend(params: string) {
     await chatEngine.value?.sendUserMessage({ prompt })
     inputValue.value = ''
     window.setTimeout(() => {
-      void chatStore.loadSessions()
+      void chatStore.loadSessions({ silent: true })
     }, 1200)
   } catch (error) {
     MessagePlugin.error(error instanceof Error ? error.message : '发送消息失败')
@@ -447,9 +376,6 @@ async function scrollToBottom() {
   listRef.value?.scrollToBottom()
 }
 
-function sessionTitle(session?: SessionSummary | null) {
-  return session?.title?.trim() || '新会话'
-}
 </script>
 
 <style scoped>
@@ -465,5 +391,15 @@ function sessionTitle(session?: SessionSummary | null) {
   padding: 8px 10px;
   color: #334155;
   font-size: 13px;
+}
+
+:global(.dark) .chat-tool-call {
+  border-color: #334155;
+  background: #15171a;
+  color: #d1d5db;
+}
+
+:global(.dark) .chat-list :deep(.t-chat__inner) {
+  background: #101214;
 }
 </style>
